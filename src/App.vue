@@ -1,13 +1,29 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <img class="logo" src="./assets/logo.png">
     <router-view/>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
   name: 'app',
+
+  created() {
+    this.fetchPlayer()
+      .then(player => this.connectSocket({ id: player.id }))
+      .then(() => this.joinChannel({ name: 'lobby' }));
+  },
+
+  methods: {
+    ...mapActions([
+      'fetchPlayer',
+      'connectSocket',
+      'joinChannel',
+    ]),
+  },
 };
 </script>
 
@@ -19,5 +35,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.logo {
+  width: 75px;
 }
 </style>

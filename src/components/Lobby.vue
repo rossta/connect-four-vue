@@ -7,8 +7,8 @@
 
 <script>
 // import debug from 'debug';
+//
 // const log = debug('app:components/Lobby');
-import { mapGetters } from 'vuex';
 
 export default {
   name: 'Lobby',
@@ -27,9 +27,9 @@ export default {
       return !this.lobbyChannel;
     },
 
-    ...mapGetters([
-      'lobbyChannel',
-    ]),
+    lobbyChannel() {
+      return this.$phoenix.channels.lobby;
+    },
   },
 };
 </script>

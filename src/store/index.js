@@ -5,7 +5,6 @@ import * as actions from './actions';
 import * as getters from './getters';
 
 import players from './modules/players';
-import channels from './modules/channels';
 
 Vue.use(Vuex);
 
@@ -16,7 +15,6 @@ export default new Vuex.Store({
   getters,
   modules: {
     players,
-    channels,
   },
   strict: debug,
 });

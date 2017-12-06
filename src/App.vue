@@ -18,10 +18,16 @@ export default {
   },
 
   methods: {
+    connectSocket(params) {
+      this.$phoenix.connect('/socket', { params });
+    },
+
+    joinChannel(options) {
+      this.$phoenix.joinChannel(options);
+    },
+
     ...mapActions([
       'fetchPlayer',
-      'connectSocket',
-      'joinChannel',
     ]),
   },
 };

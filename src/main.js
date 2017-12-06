@@ -4,6 +4,7 @@ import Vue from 'vue';
 import App from './App';
 import router from './router';
 import store from './store';
+import phoenix from './phoenix';
 
 Vue.config.productionTip = false;
 
@@ -12,6 +13,7 @@ new Vue({
   el: '#app',
   router,
   store,
+  phoenix,
   template: '<App/>',
   components: { App },
 });

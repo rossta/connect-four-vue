@@ -1,7 +1,11 @@
 <template>
-  <div class="hello">
+  <div class="lobby">
     <h1>{{ msg }}</h1>
     <h2>{{ status }}</h2>
+    <div>
+      <router-link to="/games/new">New Game</router-link>
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 

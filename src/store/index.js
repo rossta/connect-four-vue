@@ -5,6 +5,7 @@ import * as actions from './actions';
 import * as getters from './getters';
 
 import players from './modules/players';
+import games from './modules/games';
 
 Vue.use(Vuex);
 
@@ -15,6 +16,7 @@ export default new Vuex.Store({
   getters,
   modules: {
     players,
+    games,
   },
   strict: debug,
 });

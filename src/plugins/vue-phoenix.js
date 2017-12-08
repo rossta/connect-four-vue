@@ -7,7 +7,6 @@ let Vue;
 
 export default class VuePhoenix {
   constructor({ host } = {}) {
-    log('initializing VuePhoenix');
     this.host = host;
     this.vm = new Vue({
       data() {
@@ -27,41 +26,35 @@ export default class VuePhoenix {
     return this.state.sockets;
   }
 
-  get channels() {
-    return this.state.channels;
-  }
-
   get socket() {
     return this.sockets.default;
   }
 
-  connect(path, params = {}) {
-    return new Promise((resolve, reject) => {
-      log('connecting...', ...params);
-      const socket = new Socket(`${this.host}${path}`, { params });
-      socket.connect();
-      socket.onError(reject);
-
-      const name = path.replace(/^\//, '');
-      Vue.set(this.sockets, name, socket);
-      if (!this.sockets.default) Vue.set(this.sockets, 'default', socket);
-
-      resolve(socket);
-    });
+  get channels() {
+    return this.state.channels;
   }
 
-  joinChannel({ name, socket = 'default' }) {
-    return new Promise((resolve) => {
-      const channel = this.sockets[socket].channel(name);
+  connect(path, params = {}) {
+    const name = path.replace(/^\//, '');
+    if (this.sockets[name]) return this.sockets[name];
 
-      channel.join()
-        .receive('ok', response => log(`success: joined ${name}`, response))
-        .receive('error', error => log('error:', error));
+    log('connecting...', ...params);
+    const socket = new Socket(`${this.host}${path}`, { params });
+    socket.connect();
+    socket.onError(err => log('socket error', err));
 
-      Vue.set(this.channels, name, channel);
+    if (!this.sockets.default) Vue.set(this.sockets, 'default', socket);
+    Vue.set(this.sockets, name, socket);
 
-      resolve(channel);
-    });
+    return socket;
+  }
+
+  channel(name, socket = this.sockets.default) {
+    const channel = socket.channel(name);
+
+    Vue.set(this.channels, name, channel);
+
+    return channel;
   }
 }
 

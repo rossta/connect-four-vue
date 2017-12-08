@@ -1,9 +1,34 @@
 import debug from 'debug';
-import axios from 'axios';
 
-import * as types from '@/store/types';
+import axios from '../axios';
+import * as types from '../types';
 
 const log = debug('app:store/modules/players');
+
+const localPlayer = {
+  encode(player) {
+    if (!player) { return; }
+    window.localStorage.player = JSON.stringify(player);
+  },
+
+  decode() {
+    const { player } = window.localStorage;
+    return player && JSON.parse(player);
+  },
+};
+
+const fetchPlayer = function fetchPlayer() {
+  const player = localPlayer.decode();
+  if (player) return Promise.resolve(player);
+
+  return axios.post('/players')
+    .then(({ data }) => {
+      log('success', data);
+      localPlayer.encode(data);
+      return data;
+    })
+    .catch(error => log('fail', error));
+};
 
 const defaultState = {
   id: null,
@@ -14,38 +39,28 @@ const getters = {
   id: state => state.id,
 };
 
-const fetchPlayer = function fetchPlayer() {
-  const player = window.localStorage.player;
-  if (player) Promise.resolve(JSON.parse(player));
-
-  return axios.post(`${process.env.API_URL}/players`)
-    .then(({ data }) => {
-      log('success', data);
-      window.localStorage.player = JSON.stringify(data);
-      return data;
-    })
-    .catch((error) => {
-      log('fail', error);
-    });
-};
-
 const actions = {
-  fetchPlayer({ commit }) {
-    commit(types.IS_FETCHING_PLAYER);
+  fetchPlayer({ commit, state }) {
+    if (state.player) Promise.resolve(state.player);
 
-    return fetchPlayer().then((player) => {
-      commit(types.DID_FETCH_PLAYER, { player });
-      return player;
-    });
+    commit(types.WILL_FETCH_PLAYER);
+
+    return fetchPlayer()
+      .then((player) => {
+        commit(types.DID_FETCH_PLAYER, { player });
+        return player;
+      });
   },
 };
 
 const mutations = {
-  [types.IS_FETCHING_PLAYER](state) {
+  [types.WILL_FETCH_PLAYER](state) {
+    log(types.WILL_FETCH_PLAYER);
     state.isLoading = true;
   },
 
   [types.DID_FETCH_PLAYER](state, { player }) {
+    log(types.DID_FETCH_PLAYER);
     state.player = player;
     state.isLoading = false;
   },

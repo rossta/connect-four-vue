@@ -6,29 +6,18 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import debug from 'debug';
+
+const log = debug('app:App');
 
 export default {
   name: 'app',
 
   created() {
-    this.fetchPlayer()
-      .then(player => this.connectSocket({ id: player.id }))
-      .then(() => this.joinChannel({ name: 'lobby' }));
+    log('created');
   },
 
   methods: {
-    connectSocket(params) {
-      this.$phoenix.connect('/socket', { params });
-    },
-
-    joinChannel(options) {
-      this.$phoenix.joinChannel(options);
-    },
-
-    ...mapActions([
-      'fetchPlayer',
-    ]),
   },
 };
 </script>

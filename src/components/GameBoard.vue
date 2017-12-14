@@ -2,42 +2,77 @@
   <div class="game-board">
     <template v-for="row in rows">
       <template v-for="col in cols">
-        <div class="cell">
-          <GameCell
+        <div class="cell" :key="key(row, col)">
+          <game-cell
+            v-on:attempt="attemptTurn"
             :row="row"
             :col="col"
             :color="cell(row, col) || 'azure'"
-            ></GameCell>
+            >
+          </game-cell>
         </div>
       </template>
     </template>
-    </div>
   </div>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex';
-  import GameCell from './GameCell';
+import debug from 'debug';
+import { mapGetters, mapState, mapActions } from 'vuex';
 
-  const range = num => [...Array(num).keys()];
+import store from '@/store';
+import GameCell from './GameCell';
 
-  export default {
-    components: {
-      GameCell,
-    },
-    data() {
-      return {
-        rows: range(6).reverse(),
-        cols: range(7).reverse(),
-      };
+const log = debug('app:components/GameBoard');
+const range = num => [...Array(num).keys()];
+
+export default {
+  components: {
+    GameCell,
+  },
+
+  props: ['channel'],
+
+  data() {
+    const { rowCount, colCount } = store.state.games;
+    return {
+      rows: range(rowCount).reverse(), // so rows count up
+      cols: range(colCount),
+    };
+  },
+
+  computed: {
+    ...mapState({
+      hasTurn: state => state.games.hasTurn,
+      colorTurn: state => state.games.colorTurn,
+    }),
+    ...mapGetters([
+      'cell',
+    ]),
+  },
+
+  methods: {
+    key(row, col) {
+      return `${row}${col}`;
     },
 
-    computed: {
-      ...mapGetters([
-        'cell',
-      ]),
+    attemptTurn({ col }) {
+      log('attempt turn', { col });
+
+      if (!this.hasTurn) {
+        log('Not your turn', 'click', this.toObject);
+        return;
+      }
+
+      const color = this.colorTurn;
+      this.dropChecker({ col, color, channel: this.channel });
     },
-  };
+
+    ...mapActions([
+      'dropChecker',
+    ]),
+  },
+};
 </script>
 
 <style scoped>
@@ -54,5 +89,6 @@
 
   .cell {
     line-height: 0;
+    cursor: pointer;
   }
 </style>

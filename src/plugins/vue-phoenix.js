@@ -41,6 +41,7 @@ export default class VuePhoenix {
     log('connecting...', ...params);
     const socket = new Socket(`${this.host}${path}`, { params });
     socket.connect();
+    socket.onOpen(() => log('socket open'));
     socket.onError(err => log('socket error', err));
 
     if (!this.sockets.default) Vue.set(this.sockets, 'default', socket);

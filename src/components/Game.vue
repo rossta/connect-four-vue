@@ -1,9 +1,10 @@
 <template>
   <div>
     <h2>Game {{$route.params.id}}</h2>
-    <GameBoard></GameBoard>
+    <game-board :channel="channel"></game-board>
   </div>
 </template>
+
 <script>
 import debug from 'debug';
 
@@ -24,22 +25,31 @@ export default {
     gameId() {
       return this.$route.params.id;
     },
+
+    channel() {
+      return this.$phoenix.channel(`game:${this.gameId}`);
+    },
   },
 
   created() {
     log('created');
-    const gameId = this.gameId;
-    const channel = this.$phoenix.channel(`game:${this.gameId}`);
-    channel.join()
-      .receive('ok', (response) => {
-        log(`join:success ${name}`, response);
-      })
-      .receive('error', (error) => {
-        log('join:error', error.reason);
-        this.$router.push('/');
-      });
+    this.join();
+  },
 
-    this.$store.dispatch('joinGame', { gameId, channel });
+  methods: {
+    join() {
+      const gameId = this.gameId;
+      const channel = this.channel;
+
+      this.$store.dispatch('joinGame', { gameId, channel })
+        .then(() => {
+          // this.$store.dispatch('joinedGame', { gameId, channel });
+        })
+        .catch((error) => {
+          log('flash message', error);
+          this.$router.push('/');
+        });
+    },
   },
 };
 </script>

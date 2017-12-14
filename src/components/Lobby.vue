@@ -10,16 +10,28 @@
 </template>
 
 <script>
-// import debug from 'debug';
-//
-// const log = debug('app:components/Lobby');
+import debug from 'debug';
+
+const log = debug('app:components/Lobby');
 
 export default {
   name: 'Lobby',
+
   data() {
     return {
+      isLoading: false,
       msg: 'Welcome to Connect Four',
     };
+  },
+
+  created() {
+    log('created');
+    this.isLoading = true;
+    this.channel.join()
+      .receive('ok', () => {
+        this.isLoading = false;
+      })
+      .receive('error', error => log('error', error));
   },
 
   computed: {
@@ -27,12 +39,8 @@ export default {
       return this.isLoading ? 'Loading...' : 'Welcome!';
     },
 
-    isLoading() {
-      return !this.lobbyChannel;
-    },
-
-    lobbyChannel() {
-      return this.$phoenix.channels.lobby;
+    channel() {
+      return this.$phoenix.channel('lobby');
     },
   },
 };

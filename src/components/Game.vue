@@ -36,6 +36,10 @@ export default {
     this.join();
   },
 
+  watch: {
+    $route: 'join',
+  },
+
   methods: {
     join() {
       const gameId = this.gameId;

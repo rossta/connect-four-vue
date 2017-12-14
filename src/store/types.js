@@ -17,3 +17,4 @@ export const WILL_JOIN_GAME = 'WILL_JOIN_GAME';
 export const DID_JOIN_GAME = 'DID_JOIN_GAME';
 
 export const DID_GAME_UPDATE = 'DID_GAME_UPDATE';
+export const DID_BOARD_UPDATE = 'DID_BOARD_UPDATE';

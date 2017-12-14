@@ -47,6 +47,7 @@ const actions = {
 
     return fetchPlayer()
       .then((player) => {
+        log('player info', player);
         commit(types.DID_FETCH_PLAYER, { player });
         return player;
       });

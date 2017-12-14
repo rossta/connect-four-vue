@@ -46,10 +46,14 @@ const actions = {
 
     return new Promise((resolve, reject) => {
       channel.join()
-        .receive('ok', () => {
-          log('join:success', gameId);
+        .receive('ok', ({ color, game }) => {
+          const payload = { color, game };
+          log('join:success', gameId, payload);
+
+          commit(types.DID_GAME_UPDATE, payload);
+          commit(types.DID_BOARD_UPDATE, game.board);
+
           channel.push('game:joined');
-          channel.push('game:status');
         })
         .receive('error', (error) => {
           log('join:error', gameId, error.reason);
@@ -58,8 +62,9 @@ const actions = {
           reject(error);
         });
 
-      channel.on('game:status', (payload) => {
+      channel.on('game:updated', (payload) => {
         commit(types.DID_GAME_UPDATE, payload);
+        commit(types.DID_BOARD_UPDATE, payload.board);
         resolve(payload);
       });
     });
@@ -114,9 +119,9 @@ const mutations = {
     state.colorTurn = color;
   },
 
-  [types.DID_GAME_UPDATE](state, payload) {
-    log(types.DID_GAME_UPDATE, payload);
-    state.colorPlayer = payload.color;
+  [types.DID_GAME_UPDATE](state, { color, game }) {
+    log(types.DID_GAME_UPDATE, { color, game });
+    state.colorPlayer = color;
   },
 };
 

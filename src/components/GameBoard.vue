@@ -4,7 +4,7 @@
       <template v-for="col in cols">
         <div class="cell" :key="key(row, col)">
           <game-cell
-            v-on:attempt="attemptTurn"
+            v-on:attempt="attempt"
             :row="row"
             :col="col"
             :color="cell(row, col) || 'azure'"
@@ -18,7 +18,7 @@
 
 <script>
 import debug from 'debug';
-import { mapGetters, mapState, mapActions } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 import store from '@/store';
 import GameCell from './GameCell';
@@ -31,8 +31,6 @@ export default {
     GameCell,
   },
 
-  props: ['channel'],
-
   data() {
     const { rowCount, colCount } = store.state.games;
     return {
@@ -43,8 +41,7 @@ export default {
 
   computed: {
     ...mapState({
-      hasTurn: state => state.games.hasTurn,
-      colorTurn: state => state.games.colorTurn,
+      isLocked: state => state.boards.isLocked,
     }),
     ...mapGetters([
       'cell',
@@ -56,21 +53,14 @@ export default {
       return `${row}${col}`;
     },
 
-    attemptTurn({ col }) {
-      log('attempt turn', { col });
-
-      if (!this.hasTurn) {
-        log('Not your turn', 'click', this.toObject);
+    attempt({ col }) {
+      if (this.isLocked) {
+        log('board locked');
         return;
       }
 
-      const color = this.colorTurn;
-      this.dropChecker({ col, color, channel: this.channel });
+      this.$emit('attempt', { col });
     },
-
-    ...mapActions([
-      'dropChecker',
-    ]),
   },
 };
 </script>

@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import debug from 'debug';
 
 import axios from '../axios';
@@ -31,12 +32,12 @@ const fetchPlayer = function fetchPlayer() {
 };
 
 const defaultState = {
-  id: null,
+  player: null,
   isLoading: false,
 };
 
 const getters = {
-  id: state => state.id,
+  playerId: state => state.player.id,
 };
 
 const actions = {
@@ -62,7 +63,7 @@ const mutations = {
 
   [types.DID_FETCH_PLAYER](state, { player }) {
     log(types.DID_FETCH_PLAYER);
-    state.player = player;
+    Vue.set(state, 'player', player);
     state.isLoading = false;
   },
 };

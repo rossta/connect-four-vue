@@ -5,18 +5,43 @@ import * as types from '../types';
 
 const log = debug('app:store/modules/games');
 
+const AUDIENCE = 'audience';
+const RED = 'red';
+const BLACK = 'black';
+const NOT_STARTED = 'NOT_STARTED';
+
+const switchColor = color => (color === 'black' ? 'red' : 'black');
+
 const defaultState = {
+  red: undefined,
+  black: undefined,
+  winner: undefined,
+  last: RED,
+  status: NOT_STARTED,
+  turns: [],
   isCreating: false,
   isLoading: false,
   isJoining: false,
-  hasTurn: true,
-  colorTurn: 'black',
-  colorPlayer: undefined,
+  isWaiting: true,
   rowCount: 6,
   colCount: 7,
 };
 
 const getters = {
+  hasTurn: (_state, getter) => getter.color === getter.turn,
+
+  turn: (state) => {
+    const [turn] = state.turns; // most recent turn
+    const color = turn ? turn.color : RED;
+    return switchColor(color); // default
+  },
+
+  color: (state, getter) => {
+    const { red, black } = state;
+    if (getter.playerId === red) return RED;
+    if (getter.playerId === black) return BLACK;
+    return AUDIENCE;
+  },
 };
 
 const createGame = function createGame() {
@@ -46,14 +71,14 @@ const actions = {
 
     return new Promise((resolve, reject) => {
       channel.join()
-        .receive('ok', ({ color, game }) => {
-          const payload = { color, game };
-          log('join:success', gameId, payload);
+        .receive('ok', (game) => {
+          const { board } = game;
+          log('join:success', gameId, game);
 
-          commit(types.DID_GAME_UPDATE, payload);
-          commit(types.DID_BOARD_UPDATE, game.board);
-
-          channel.push('game:joined');
+          commit(types.DID_GAME_UPDATE, { game });
+          commit(types.DID_BOARD_UPDATE, { board });
+          resolve(game);
+          // channel.push('game:joined');
         })
         .receive('error', (error) => {
           log('join:error', gameId, error.reason);
@@ -62,10 +87,10 @@ const actions = {
           reject(error);
         });
 
-      channel.on('game:updated', (payload) => {
-        commit(types.DID_GAME_UPDATE, payload);
-        commit(types.DID_BOARD_UPDATE, payload.board);
-        resolve(payload);
+      channel.on('game:updated', (game) => {
+        const { board } = game;
+        commit(types.DID_GAME_UPDATE, { game });
+        commit(types.DID_BOARD_UPDATE, { board });
       });
     });
   },
@@ -79,7 +104,6 @@ const actions = {
       channel.leave()
         .receive('ok', (response) => {
           log('leave:success', gameId, response);
-          resolve(response);
         })
         .receive('ok', (error) => {
           log('leave:error', gameId, error.reason);
@@ -113,15 +137,23 @@ const mutations = {
   },
 
   [types.DID_SWITCH_TURN](state) {
-    const color = state.colorTurn === 'black'
-      ? 'red'
-      : 'black';
-    state.colorTurn = color;
+    state.last = switchColor(state.last);
   },
 
-  [types.DID_GAME_UPDATE](state, { color, game }) {
-    log(types.DID_GAME_UPDATE, { color, game });
-    state.colorPlayer = color;
+  [types.WILL_GAME_UPDATE](state) {
+    state.isWaiting = true;
+  },
+
+  [types.DID_GAME_UPDATE](state, { game }) {
+    log(types.DID_GAME_UPDATE, { game });
+    const { red, black, last, status, winner, turns } = game;
+    state.isWaiting = false;
+    state.red = red;
+    state.black = black;
+    state.last = last;
+    state.status = status;
+    state.winner = winner;
+    state.turns = turns;
   },
 };
 

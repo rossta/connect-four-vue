@@ -37,6 +37,11 @@ const getters = {
 
 const actions = {
   dropChecker: ({ commit, dispatch, state, getters, rootState }, { col, color, channel }) => {
+    log('status', rootState.games.status, 'gameInPlay', getters.gameInPlay);
+    if (!getters.gameInPlay) {
+      log('game is not in play');
+      return;
+    }
     if (!getters.hasTurn) {
       log('not your turn');
       return;
@@ -67,9 +72,6 @@ const actions = {
 };
 
 const mutations = {
-  [types.WILL_BOARD_UPDATE](state) {
-    state.isLocked = true;
-  },
   [types.WILL_FALL_CHECKER]: (state, { col, color }) => {
     log(types.WILL_FALL_CHECKER, { col, color });
     state.droppedChecker = { col, color };
@@ -77,6 +79,9 @@ const mutations = {
   [types.DID_LAND_CHECKER]: (state, { checker }) => {
     log(types.DID_LAND_CHECKER, checker);
     setCell(state.cells, checker);
+  },
+  [types.WILL_BOARD_UPDATE](state) {
+    state.isLocked = true;
   },
   [types.DID_BOARD_UPDATE]: (state, { board }) => {
     state.isLocked = false;

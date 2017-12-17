@@ -9,6 +9,7 @@ const AUDIENCE = 'audience';
 const RED = 'red';
 const BLACK = 'black';
 const NOT_STARTED = 'NOT_STARTED';
+const IN_PLAY = 'IN_PLAY';
 
 const switchColor = color => (color === 'black' ? 'red' : 'black');
 
@@ -28,6 +29,7 @@ const defaultState = {
 };
 
 const getters = {
+  gameInPlay: state => state.status === IN_PLAY,
   hasTurn: (_state, getter) => getter.color === getter.turn,
 
   turn: (state) => {
@@ -147,11 +149,12 @@ const mutations = {
   [types.DID_GAME_UPDATE](state, { game }) {
     log(types.DID_GAME_UPDATE, { game });
     const { red, black, last, status, winner, turns } = game;
+    if (winner) log('WINNER!!!', winner);
     state.isWaiting = false;
     state.red = red;
     state.black = black;
     state.last = last;
-    state.status = status;
+    state.status = status.toUpperCase();
     state.winner = winner;
     state.turns = turns;
   },

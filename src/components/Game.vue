@@ -2,18 +2,25 @@
   <div>
     <h2>Game {{$route.params.id}}</h2>
     <p>
-      your color: {{color}}  | player turn: {{turn}}  | {{ hasTurn ? 'Your turn!' : 'Waiting...' }}
+      <span>your color: {{color}}</span> |
+      <span>player turn: {{turn}}</span>  |
+
+      <span v-if="gameNotStarted">status: Waiting for more players</span>
+      <span v-if="gameInPlay">status: {{ hasTurn ? "Your turn!" : "Wait..." }}</span>
+
+      <template v-if="gameOver">
+        <span>status: game over!</span> |
+        <span>winner: {{winner}}</span>
+      </template>
     </p>
     <a class="btn"></a>
-    <game-board
-      v-on:attempt="attempt"
-      ></game-board>
+    <game-board :channel="channel"></game-board>
   </div>
 </template>
 
 <script>
 import debug from 'debug';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 import GameBoard from './GameBoard';
 
@@ -46,10 +53,17 @@ export default {
       return this.$phoenix.channel(`game:${this.gameId}`);
     },
 
+    ...mapState({
+      winner: state => state.games.winner,
+    }),
+
     ...mapGetters([
       'hasTurn',
       'turn',
       'color',
+      'gameInPlay',
+      'gameNotStarted',
+      'gameOver',
     ]),
   },
 
@@ -58,21 +72,11 @@ export default {
       return `${row}${col}`;
     },
 
-    attempt({ col }) {
-      log('attempt turn', { col });
-
-      const color = this.color;
-      this.dropChecker({ col, color, channel: this.channel });
-    },
-
     join() {
       const gameId = this.gameId;
       const channel = this.channel;
 
       this.joinGame({ gameId, channel })
-        .then(() => {
-          // this.$store.dispatch('joinedGame', { gameId, channel });
-        })
         .catch((error) => {
           log('flash message', error);
           this.$router.push('/');
@@ -80,7 +84,6 @@ export default {
     },
 
     ...mapActions([
-      'dropChecker',
       'joinGame',
     ]),
   },

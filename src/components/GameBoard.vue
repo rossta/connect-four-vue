@@ -18,7 +18,7 @@
 
 <script>
 import debug from 'debug';
-import { mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 import store from '@/store';
 import GameCell from './GameCell';
@@ -27,6 +27,8 @@ const log = debug('app:components/GameBoard');
 const range = num => [...Array(num).keys()];
 
 export default {
+  props: ['channel'],
+
   components: {
     GameCell,
   },
@@ -45,6 +47,7 @@ export default {
     }),
     ...mapGetters([
       'cell',
+      'color',
     ]),
   },
 
@@ -59,8 +62,13 @@ export default {
         return;
       }
 
-      this.$emit('attempt', { col });
+      const color = this.color;
+      this.dropChecker({ col, color, channel: this.channel });
     },
+
+    ...mapActions([
+      'dropChecker',
+    ]),
   },
 };
 </script>

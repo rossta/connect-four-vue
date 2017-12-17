@@ -10,6 +10,7 @@ const RED = 'red';
 const BLACK = 'black';
 const NOT_STARTED = 'NOT_STARTED';
 const IN_PLAY = 'IN_PLAY';
+const OVER = 'OVER';
 
 const switchColor = color => (color === 'black' ? 'red' : 'black');
 
@@ -29,7 +30,10 @@ const defaultState = {
 };
 
 const getters = {
+  gameNotStarted: state => state.status === NOT_STARTED,
   gameInPlay: state => state.status === IN_PLAY,
+  gameOver: state => state.status === OVER,
+
   hasTurn: (_state, getter) => getter.color === getter.turn,
 
   turn: (state) => {

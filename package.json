@@ -5,6 +5,7 @@
   "author": "Ross Kaffenberger <rosskaff@gmail.com>",
   "private": true,
   "scripts": {
+    "docker": "HOST=0.0.0.0 yarn run dev",
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "yarn run dev",
     "unit": "jest --config test/unit/jest.conf.js --coverage",

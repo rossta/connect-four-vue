@@ -3,7 +3,7 @@
     <h2>Game {{$route.params.id}}</h2>
     <p>
       <span>your color: {{color}}</span> |
-      <span>player turn: {{turn}}</span>  |
+      <span>player turn: {{next}}</span>  |
 
       <span v-if="gameNotStarted">status: Waiting for more players</span>
       <span v-if="gameInPlay">status: {{ hasTurn ? "Your turn!" : "Wait..." }}</span>
@@ -55,11 +55,11 @@ export default {
 
     ...mapState({
       winner: state => state.games.winner,
+      next: state => state.games.next,
     }),
 
     ...mapGetters([
       'hasTurn',
-      'turn',
       'color',
       'gameInPlay',
       'gameNotStarted',

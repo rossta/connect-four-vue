@@ -18,7 +18,7 @@ const defaultState = {
   red: undefined,
   black: undefined,
   winner: undefined,
-  last: RED,
+  next: undefined,
   status: NOT_STARTED,
   turns: [],
   isCreating: false,
@@ -34,13 +34,7 @@ const getters = {
   gameInPlay: state => state.status === IN_PLAY,
   gameOver: state => state.status === OVER,
 
-  hasTurn: (_state, getter) => getter.color === getter.turn,
-
-  turn: (state) => {
-    const [turn] = state.turns; // most recent turn
-    const color = turn ? turn.color : RED;
-    return switchColor(color); // default
-  },
+  hasTurn: (state, getter) => getter.color === state.next,
 
   color: (state, getter) => {
     const { red, black } = state;
@@ -72,19 +66,22 @@ const actions = {
     });
   },
 
-  joinGame({ commit, dispatch }, { gameId, channel }) {
+  joinGame({ commit, dispatch, getters }, { gameId, channel }) {
     commit(types.WILL_JOIN_GAME, { gameId });
 
     return new Promise((resolve, reject) => {
       channel.join()
         .receive('ok', (game) => {
           const { board } = game;
-          log('join:success', gameId, game);
+
+          if (game.red === getters.playerId || game.black == getters.playerId) {
+            log('join:success', gameId, game);
+            channel.push('game:joined');
+          }
 
           commit(types.DID_GAME_UPDATE, { game });
           commit(types.DID_BOARD_UPDATE, { board });
           resolve(game);
-          // channel.push('game:joined');
         })
         .receive('error', (error) => {
           log('join:error', gameId, error.reason);
@@ -93,11 +90,14 @@ const actions = {
           reject(error);
         });
 
-      channel.on('game:updated', (game) => {
+      const updateGame = (game) => {
         const { board } = game;
         commit(types.DID_GAME_UPDATE, { game });
         commit(types.DID_BOARD_UPDATE, { board });
-      });
+      };
+
+      channel.on('game:welcome', updateGame);
+      channel.on('game:updated', updateGame);
     });
   },
 
@@ -143,7 +143,7 @@ const mutations = {
   },
 
   [types.DID_SWITCH_TURN](state) {
-    state.last = switchColor(state.last);
+    state.next = switchColor(state.next);
   },
 
   [types.WILL_GAME_UPDATE](state) {
@@ -152,12 +152,12 @@ const mutations = {
 
   [types.DID_GAME_UPDATE](state, { game }) {
     log(types.DID_GAME_UPDATE, { game });
-    const { red, black, last, status, winner, turns } = game;
+    const { red, black, next, status, winner, turns } = game;
     if (winner) log('WINNER!!!', winner);
     state.isWaiting = false;
     state.red = red;
     state.black = black;
-    state.last = last;
+    state.next = next;
     state.status = status.toUpperCase();
     state.winner = winner;
     state.turns = turns;

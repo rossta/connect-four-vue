@@ -77,8 +77,8 @@ export default {
   .game-board {
     border: 5px cadetblue solid;
 
-    width: 525px;
-    height: 450px;
+    width: 420px;
+    height: 360px;
     margin: 0 auto;
 
     display: grid;

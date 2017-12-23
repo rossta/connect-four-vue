@@ -9,34 +9,40 @@
 </template>
 
 <script>
-  const adjust = {
-    red: '#FC7E69',
-    black: '#254689',
-  };
+import debug from 'debug';
 
-  export default {
-    props: ['row', 'col', 'color'],
+const log = debug('app:components/GameCell');
 
-    created() {
+const adjust = {
+  red: '#FC7E69',
+  black: '#254689',
+};
+
+export default {
+  props: ['row', 'col', 'color'],
+
+  updated() {
+    log('drawing cell', this.row, this.col, this.color);
+  },
+
+  methods: {
+    attempt() {
+      const col = this.col;
+      this.$emit('attempt', { col });
+    },
+  },
+
+  computed: {
+    toObject() {
+      return { row: this.row, col: this.col, color: this.color };
     },
 
-    methods: {
-      attempt() {
-        const col = this.col;
-        this.$emit('attempt', { col });
-      },
+    adjustedColor() {
+      const color = this.color;
+      return adjust[color] || color;
     },
-
-    computed: {
-      toObject() {
-        return { row: this.row, col: this.col, color: this.color };
-      },
-
-      adjustedColor() {
-        return adjust[this.color] || this.color;
-      },
-    },
-  };
+  },
+};
 </script>
 
 <style scoped>

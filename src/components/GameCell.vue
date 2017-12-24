@@ -1,15 +1,15 @@
 <template>
-  <svg
-    viewBox="0 0 200 200"
-    xmlns="http://www.w3.org/2000/svg"
+  <game-checker
+    :id="domId"
+    :color="adjustedColor"
     @click="attempt"
-    >
-    <circle cx="100" cy="100" r="80" :fill="adjustedColor" />
-  </svg>
+    ></game-checker>
 </template>
 
 <script>
 import debug from 'debug';
+
+import GameChecker from './GameChecker';
 
 const log = debug('app:components/GameCell');
 
@@ -20,6 +20,10 @@ const adjust = {
 
 export default {
   props: ['row', 'col', 'color'],
+
+  components: {
+    GameChecker,
+  },
 
   updated() {
     log('drawing cell', this.row, this.col, this.color);
@@ -33,6 +37,10 @@ export default {
   },
 
   computed: {
+    domId() {
+      return `cell-${this.row}-${this.col}`;
+    },
+
     toObject() {
       return { row: this.row, col: this.col, color: this.color };
     },
@@ -47,7 +55,7 @@ export default {
 
 <style scoped>
   svg {
-    background-color: cadetblue;
+    background-color: transparent;
     cursor: pointer;
   }
 </style>

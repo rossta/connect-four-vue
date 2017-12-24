@@ -1,13 +1,17 @@
 <template>
   <div class="game-board">
+    <game-checker
+      :id="'falling-checker'"
+      ></game-checker>
     <template v-for="row in rows">
       <template v-for="col in cols">
-        <div class="cell" :key="key(row, col)">
+        <div class="cell">
           <game-cell
+            :key="key(row, col)"
             v-on:attempt="attempt"
             :row="row"
             :col="col"
-            :color="cell(row, col) || 'azure'"
+            :color="cell(row, col) || 'transparent'"
             >
           </game-cell>
         </div>
@@ -22,6 +26,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 
 import store from '@/store';
 import GameCell from './GameCell';
+import GameChecker from './GameChecker';
 
 const log = debug('app:components/GameBoard');
 const range = num => [...Array(num).keys()];
@@ -31,6 +36,7 @@ export default {
 
   components: {
     GameCell,
+    GameChecker,
   },
 
   data() {
@@ -76,6 +82,7 @@ export default {
 <style scoped>
   .game-board {
     border: 5px cadetblue solid;
+    background-color: cadetblue;
 
     width: 420px;
     height: 360px;
@@ -88,5 +95,10 @@ export default {
   .cell {
     line-height: 0;
     cursor: pointer;
+  }
+
+  #falling-checker {
+    position: absolute;
+    z-index: -1;
   }
 </style>

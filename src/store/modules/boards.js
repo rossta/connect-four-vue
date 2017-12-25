@@ -4,35 +4,35 @@ import * as types from '../types';
 
 const log = debug('app:store/modules/boards');
 
-const openRow = (cells, givenCol) => {
-  const rows = Object.values(cells)
+const openRow = (checkers, givenCol) => {
+  const rows = Object.values(checkers)
     .filter(({ col }) => col === givenCol)
     .map(({ row }) => row);
   const top = Math.max(-1, ...rows);
   return top + 1;
 };
 
-const cellKey = (row, col) => `${row}${col}`;
-const setCell = (cells, { row, col, color }) => {
-  return Vue.set(cells, cellKey(row, col), { row, col, color });
+const checkerKey = (row, col) => `${row}${col}`;
+const setChecker = (checkers, { row, col, color }) => {
+  return Vue.set(checkers, checkerKey(row, col), { row, col, color });
 };
-const getCell = (cells, row, col) => {
-  return cells[cellKey(row, col)] || {};
+const getChecker = (checkers, row, col) => {
+  return checkers[checkerKey(row, col)] || {};
 };
-const setCells = (state, cells) => {
-  Vue.set(state, 'cells', cells);
+const setCheckers = (state, checkers) => {
+  Vue.set(state, 'checkers', checkers);
 };
 
-const cells = {};
+const checkers = {};
 
 const defaultState = {
-  cells,
+  checkers,
   isLocked: true,
   droppedChecker: undefined,
 };
 
 const getters = {
-  cell: state => (row, col) => getCell(state.cells, row, col).color,
+  checkerColor: state => (row, col) => getChecker(state.checkers, row, col).color,
 };
 
 const actions = {
@@ -46,7 +46,7 @@ const actions = {
       log('not your turn');
       return;
     }
-    const row = openRow(state.cells, col);
+    const row = openRow(state.checkers, col);
     if (row > rootState.games.rowCount) {
       log('row full');
       return;
@@ -78,14 +78,14 @@ const mutations = {
   },
   [types.DID_LAND_CHECKER]: (state, { checker }) => {
     log(types.DID_LAND_CHECKER, checker);
-    setCell(state.cells, checker);
+    setChecker(state.checkers, checker);
   },
   [types.WILL_BOARD_UPDATE](state) {
     state.isLocked = true;
   },
   [types.DID_BOARD_UPDATE]: (state, { board }) => {
     state.isLocked = false;
-    setCells(state, board.cells);
+    setCheckers(state, board.cells);
   },
 };
 

@@ -1,18 +1,21 @@
 <template>
-  <svg
-    viewBox="0 0 200 200"
-    xmlns="http://www.w3.org/2000/svg"
-    >
-    <circle cx="100" cy="100" r="80" :fill="color" />
-  </svg>
+  <circle :id="domId" :cx="cx" :cy="cy" :r="r" :fill="adjustedColor" />
 </template>
 
 <script>
-import debug from 'debug';
-
-const log = debug('app:components/GameChecker');
+const adjust = {
+  red: '#FC7E69',
+  black: '#254689',
+};
 
 export default {
-  props: ['color'],
+  props: ['domId', 'color', 'cx', 'cy', 'r'],
+
+  computed: {
+    adjustedColor() {
+      const color = this.color;
+      return adjust[color] || color;
+    },
+  },
 };
 </script>

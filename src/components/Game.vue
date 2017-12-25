@@ -2,7 +2,7 @@
   <div>
     <h2>Game {{$route.params.id}}</h2>
     <p>
-      <span>your color: {{color}}</span> |
+      <span>your color: {{playerColor}}</span> |
       <span>player turn: {{next}}</span>  |
 
       <span v-if="gameNotStarted">status: Waiting for more players</span>
@@ -60,7 +60,7 @@ export default {
 
     ...mapGetters([
       'hasTurn',
-      'color',
+      'playerColor',
       'gameInPlay',
       'gameNotStarted',
       'gameOver',

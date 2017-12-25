@@ -34,9 +34,9 @@ const getters = {
   gameInPlay: state => state.status === IN_PLAY,
   gameOver: state => state.status === OVER,
 
-  hasTurn: (state, getter) => getter.color === state.next,
+  hasTurn: (state, getter) => getter.playerColor === state.next,
 
-  color: (state, getter) => {
+  playerColor: (state, getter) => {
     const { red, black } = state;
     if (getter.playerId === red) return RED;
     if (getter.playerId === black) return BLACK;
@@ -74,7 +74,7 @@ const actions = {
         .receive('ok', (game) => {
           const { board } = game;
 
-          if (game.red === getters.playerId || game.black == getters.playerId) {
+          if (game.red === getters.playerId || game.black === getters.playerId) {
             log('join:success', gameId, game);
             channel.push('game:joined');
           }

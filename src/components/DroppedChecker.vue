@@ -53,7 +53,7 @@ export default {
 
     duration() {
       const percentage = (this.rowCount - this.checker.row) / this.rowCount;
-      return 0.5 + 0.25 * percentage;
+      return 0.4 + 0.20 * percentage;
     },
 
     ...mapState({
@@ -77,7 +77,7 @@ export default {
       const onComplete = () => this.landChecker().then(done);
 
       return TweenLite.fromTo(el, this.duration, {
-        y: -this.cellSize * 2,
+        y: -this.cellSize * 1.5,
       }, {
         y: this.checkerY,
         ease: Ease,

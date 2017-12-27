@@ -38,6 +38,9 @@ const getters = {
   checkerColor: state => (row, col) => getChecker(state.checkers, row, col).color,
   droppedChecker: state => state.droppedChecker,
 
+  boardWidth: state => state.colCount * state.cellSize,
+  boardHeight: state => state.rowCount * state.cellSize,
+
   checkerX: state => (col) => {
     return (state.cellSize / 2) + (state.cellSize * col);
   },

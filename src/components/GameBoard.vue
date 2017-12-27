@@ -1,29 +1,71 @@
 <template>
-  <svg viewBox="0 0 700 600" xmlns="http://www.w3.org/2000/svg" class="game-board">
+  <svg
+    :viewBox="`0 0 ${boardWidth} ${boardHeight}`"
+    xmlns="http://www.w3.org/2000/svg"
+    class="game-board"
+    >
+    <defs>
+      <pattern
+        id="cell-spaces"
+        x="0"
+        y="0"
+        patternUnits="userSpaceOnUse"
+        :width="cellSize"
+        :height="cellSize"
+        >
+        <circle
+          stroke="none"
+          fill="black"
+          :cx="cellSize / 2"
+          :cy="cellSize / 2"
+          :r="checkerRadius"
+        ></circle>
+      </pattern>
+      <mask id="game-wall-mask" x="0" y="0">
+        <rect
+          x="0"
+          y="0"
+          :width="boardWidth"
+          :height="boardHeight"
+          fill="white"
+          stroke="none"
+        ></rect>
+        <rect
+          x="0"
+          y="0"
+          :width="boardWidth"
+          :height="boardHeight"
+          stroke="none"
+          fill="url(#cell-spaces)"
+        ></rect>
+      </mask>
+    </defs>
+    <dropped-checker :checker="droppedChecker"></dropped-checker>
     <template v-for="col in cols">
       <g @click="drop(col)" class="column">
-        <rect
-          fill="cadetblue"
-          :key="col"
-          :col="col"
-          :x="size * col"
-          :y="0"
-          :width="size"
-          :height="size * rows.length">
-        </rect>
         <template v-for="row in rows">
           <game-checker
+            v-if="checkerColor(row, col)"
             :key="key(row, col)"
             :domId="`checker-${row}-${col}`"
-            :color="checkerColor(row, col) || 'azure'"
+            :color="checkerColor(row, col)"
             :cx="checkerX(col)"
             :cy="checkerY(row)"
             :r="checkerRadius"
             ></game-checker>
         </template>
+        <rect
+          fill="cadetblue"
+          mask="url(#game-wall-mask)"
+          :key="col"
+          :col="col"
+          :x="cellSize * col"
+          y="0"
+          :width="cellSize"
+          :height="cellSize * rows.length"
+        ></rect>
       </g>
     </template>
-    <dropped-checker :checker="droppedChecker"></dropped-checker>
   </svg>
 </template>
 
@@ -47,19 +89,23 @@ export default {
   },
 
   data() {
-    const { rowCount, colCount, cellSize } = store.state.boards;
+    const { rowCount, colCount } = store.state.boards;
     return {
       rows: range(rowCount).reverse(), // so rows count up
       cols: range(colCount),
-      size: cellSize,
     };
   },
 
   computed: {
     ...mapState({
       isLocked: state => state.boards.isLocked,
+      rowCount: state => state.boards.rowCount,
+      colCount: state => state.boards.colCount,
+      cellSize: state => state.boards.cellSize,
     }),
     ...mapGetters([
+      'boardWidth',
+      'boardHeight',
       'droppedChecker',
       'checkerColor',
       'checkerRadius',

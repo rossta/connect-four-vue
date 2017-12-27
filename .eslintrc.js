@@ -39,6 +39,7 @@ module.exports = {
     'arrow-body-style': 'off',
     'no-param-reassign': 'off',
     'no-underscore-dangle': 'off',
-    'no-shadow': 'off'
+    'no-shadow': 'off',
+    'no-mixed-operators': 'off'
   }
 }

@@ -19,11 +19,11 @@
             :cx="checkerX(col)"
             :cy="checkerY(row)"
             :r="checkerRadius"
-            >
-          </game-checker>
+            ></game-checker>
         </template>
       </g>
     </template>
+    <dropped-checker :checker="droppedChecker"></dropped-checker>
   </svg>
 </template>
 
@@ -33,6 +33,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 
 import store from '@/store';
 import GameChecker from './GameChecker';
+import DroppedChecker from './DroppedChecker';
 
 const log = debug('app:components/GameBoard');
 const range = num => [...Array(num).keys()];
@@ -42,39 +43,31 @@ export default {
 
   components: {
     GameChecker,
+    DroppedChecker,
   },
 
   data() {
-    const { rowCount, colCount } = store.state.games;
+    const { rowCount, colCount, cellSize } = store.state.boards;
     return {
       rows: range(rowCount).reverse(), // so rows count up
       cols: range(colCount),
-      size: 100,
+      size: cellSize,
     };
   },
 
   computed: {
-    checkerRadius() {
-      return this.size * 0.45;
-    },
     ...mapState({
       isLocked: state => state.boards.isLocked,
     }),
     ...mapGetters([
+      'droppedChecker',
       'checkerColor',
+      'checkerRadius',
       'playerColor',
     ]),
   },
 
   methods: {
-    checkerX(col) {
-      return (this.size / 2) + (this.size * col);
-    },
-
-    checkerY(row) {
-      return (this.size / 2) + (this.size * (this.rows.length - 1 - row));
-    },
-
     key(row, col) {
       return `${row}${col}`;
     },
@@ -87,8 +80,16 @@ export default {
         return;
       }
 
-      const color = this.color;
+      const color = this.playerColor;
       this.dropChecker({ col, color, channel: this.channel });
+    },
+
+    checkerX(col) {
+      return this.$store.getters.checkerX(col);
+    },
+
+    checkerY(row) {
+      return this.$store.getters.checkerY(row);
     },
 
     ...mapActions([

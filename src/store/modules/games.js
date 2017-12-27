@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 import debug from 'debug';
 
 import axios from '../axios';
@@ -12,7 +14,7 @@ const NOT_STARTED = 'NOT_STARTED';
 const IN_PLAY = 'IN_PLAY';
 const OVER = 'OVER';
 
-const switchColor = color => (color === 'black' ? 'red' : 'black');
+// const switchColor = color => (color === 'black' ? 'red' : 'black');
 
 const defaultState = {
   red: undefined,
@@ -25,8 +27,6 @@ const defaultState = {
   isLoading: false,
   isJoining: false,
   isWaiting: true,
-  rowCount: 6,
-  colCount: 7,
 };
 
 const getters = {
@@ -91,18 +91,31 @@ const actions = {
         });
 
       const updateGame = (game) => {
-        const { board } = game;
-        commit(types.DID_GAME_UPDATE, { game });
-        commit(types.DID_BOARD_UPDATE, { board });
+        if (getters.droppedChecker) {
+          dispatch('enqueueUpdateGame', { game });
+        } else {
+          dispatch('updateGame', { game });
+        }
       };
-
       channel.on('game:welcome', updateGame);
       channel.on('game:updated', updateGame);
     });
   },
 
+  enqueueUpdateGame({ commit }, { game }) {
+    commit(types.ENQUEUE_GAME_UPDATE, { game });
+  },
+
+  updateGame({ commit }, { game }) {
+    const { board } = game;
+    commit(types.DID_GAME_UPDATE, { game });
+    commit(types.DID_BOARD_UPDATE, { board });
+    return Promise.resolve(true);
+  },
+
   sendMove({ commit }, { col, channel }) {
-    channel.push('game:move', { col });
+    const push = channel.push('game:move', { col });
+    return Promise.resolve(push);
   },
 
   leaveGame({ commit }, { gameId, channel }) {
@@ -143,11 +156,20 @@ const mutations = {
   },
 
   [types.DID_SWITCH_TURN](state) {
-    state.next = switchColor(state.next);
+    log(types.DID_SWITCH_TURN, state.next);
+    // state.next = switchColor(state.next);
   },
 
   [types.WILL_GAME_UPDATE](state) {
     state.isWaiting = true;
+  },
+
+  [types.ENQUEUE_GAME_UPDATE](state, { game }) {
+    state.queuedGame = game;
+  },
+
+  [types.DEQUEUE_GAME_UPDATE](state) {
+    Vue.delete(state, 'queuedGame');
   },
 
   [types.DID_GAME_UPDATE](state, { game }) {

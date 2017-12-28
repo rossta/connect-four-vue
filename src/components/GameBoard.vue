@@ -1,43 +1,12 @@
 <template>
-  <svg
-    :viewBox="`0 0 ${boardWidth} ${boardHeight}`"
-    xmlns="http://www.w3.org/2000/svg"
-    class="game-board"
-    >
+  <svg :viewBox="`0 0 ${boardWidth} ${boardHeight}`" xmlns="http://www.w3.org/2000/svg" class="game-board" stroke="none">
     <defs>
-      <pattern
-        id="cell-spaces"
-        x="0"
-        y="0"
-        patternUnits="userSpaceOnUse"
-        :width="cellSize"
-        :height="cellSize"
-        >
-        <circle
-          stroke="none"
-          fill="black"
-          :cx="cellSize / 2"
-          :cy="cellSize / 2"
-          :r="checkerRadius"
-        ></circle>
+      <pattern id="cell-spaces" x="0" y="0" patternUnits="userSpaceOnUse" :width="cellSize" :height="cellSize">
+        <circle :cx="cellSize / 2" :cy="cellSize / 2" :r="checkerRadius" fill="black" ></circle>
       </pattern>
-      <mask id="game-wall-mask" x="0" y="0">
-        <rect
-          x="0"
-          y="0"
-          :width="boardWidth"
-          :height="boardHeight"
-          fill="white"
-          stroke="none"
-        ></rect>
-        <rect
-          x="0"
-          y="0"
-          :width="boardWidth"
-          :height="boardHeight"
-          stroke="none"
-          fill="url(#cell-spaces)"
-        ></rect>
+      <mask id="game-wall" x="0" y="0">
+        <rect x="0" y="0" :width="boardWidth" :height="boardHeight" fill="white"></rect>
+        <rect x="0" y="0" :width="boardWidth" :height="boardHeight" fill="url(#cell-spaces)"></rect>
       </mask>
     </defs>
     <template v-for="col in cols">
@@ -49,20 +18,17 @@
             :row="row"
             :col="col"
             :color="checkerColor(row, col)"
-            :cx="checkerX(col)"
-            :cy="checkerY(row)"
-            :r="checkerRadius"
             ></board-checker>
         </template>
         <rect
-          fill="cadetblue"
-          mask="url(#game-wall-mask)"
           :key="col"
           :col="col"
+          :width="cellSize"
+          :height="boardHeight"
           :x="cellSize * col"
           y="0"
-          :width="cellSize"
-          :height="cellSize * rows.length"
+          fill="cadetblue"
+          mask="url(#game-wall)"
         ></rect>
       </g>
     </template>
@@ -127,14 +93,6 @@ export default {
       this.dropChecker({ col, color, channel: this.channel });
     },
 
-    checkerX(col) {
-      return this.$store.getters.checkerX(col);
-    },
-
-    checkerY(row) {
-      return this.$store.getters.checkerY(row);
-    },
-
     ...mapActions([
       'dropChecker',
     ]),
@@ -149,9 +107,6 @@ export default {
   width: 420px;
   height: 360px;
   margin: 0 auto;
-
-  display: grid;
-  grid-template: repeat(6, 1fr) / repeat(7, 1fr);
 }
 
 .column {

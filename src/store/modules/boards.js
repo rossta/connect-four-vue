@@ -36,10 +36,10 @@ const getters = {
   boardWidth: state => state.colCount * state.cellSize,
   boardHeight: state => state.rowCount * state.cellSize,
 
-  checkerX: state => (col) => {
+  centerX: state => (col) => {
     return (state.cellSize / 2) + (state.cellSize * col);
   },
-  checkerY: state => (row) => {
+  centerY: state => (row) => {
     return (state.cellSize / 2) + (state.cellSize * (state.rowCount - 1 - row));
   },
   checkerRadius: state => state.cellSize * 0.45,
@@ -66,8 +66,8 @@ const actions = {
     commit(types.WILL_BOARD_UPDATE);
 
     Promise.all([
-      dispatch('sendMove', { col, channel }),
-      dispatch('switchTurn'),
+      dispatch('sendMove', { col, color, channel }),
+      dispatch('switchTurn', { color }),
     ]);
   },
 };

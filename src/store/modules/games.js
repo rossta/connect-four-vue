@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 import debug from 'debug';
 
 import axios from '../axios';
@@ -90,16 +88,10 @@ const actions = {
           reject(error);
         });
 
-      const updateGame = (game) => {
-        dispatch('updateGame', { game });
-      };
+      const updateGame = game => dispatch('updateGame', { game });
       channel.on('game:welcome', updateGame);
       channel.on('game:updated', updateGame);
     });
-  },
-
-  enqueueUpdateGame({ commit }, { game }) {
-    commit(types.ENQUEUE_GAME_UPDATE, { game });
   },
 
   updateGame({ commit }, { game }) {
@@ -127,8 +119,8 @@ const actions = {
     });
   },
 
-  switchTurn({ commit }) {
-    commit(types.DID_SWITCH_TURN);
+  switchTurn({ commit }, { color }) {
+    commit(types.DID_SWITCH_TURN, { color });
     return Promise.resolve(true);
   },
 };
@@ -151,8 +143,8 @@ const mutations = {
     state.isJoining = false;
   },
 
-  [types.DID_SWITCH_TURN](state) {
-    log(types.DID_SWITCH_TURN, state.next);
+  [types.DID_SWITCH_TURN](state, { color }) {
+    log(types.DID_SWITCH_TURN, 'next', state.next, 'from', color);
     // state.next = switchColor(state.next);
   },
 

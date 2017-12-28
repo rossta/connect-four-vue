@@ -13,9 +13,6 @@ const openRow = (checkers, givenCol) => {
 };
 
 const checkerKey = (row, col) => `${row}${col}`;
-// const setChecker = (checkers, { row, col, color }) => {
-//   return Vue.set(checkers, checkerKey(row, col), { row, col, color });
-// };
 const getChecker = (checkers, row, col) => {
   return checkers[checkerKey(row, col)] || {};
 };
@@ -28,7 +25,6 @@ const checkers = {};
 const defaultState = {
   checkers,
   isLocked: true,
-  droppedChecker: undefined,
   rowCount: 6,
   colCount: 7,
   cellSize: 100,
@@ -36,7 +32,6 @@ const defaultState = {
 
 const getters = {
   checkerColor: state => (row, col) => getChecker(state.checkers, row, col).color,
-  droppedChecker: state => state.droppedChecker,
 
   boardWidth: state => state.colCount * state.cellSize,
   boardHeight: state => state.rowCount * state.cellSize,
@@ -67,41 +62,17 @@ const actions = {
       return;
     }
 
+    commit(types.WILL_GAME_UPDATE);
+    commit(types.WILL_BOARD_UPDATE);
+
     Promise.all([
       dispatch('sendMove', { col, channel }),
-      dispatch('fallChecker', { row, col, color }),
+      dispatch('switchTurn'),
     ]);
-  },
-
-  fallChecker({ commit, dispatch }, { row, col, color }) {
-    commit(types.WILL_GAME_UPDATE);
-    commit(types.WILL_FALL_CHECKER, { row, col, color });
-    return Promise.resolve(true);
-  },
-
-  landChecker({ commit, dispatch, rootState }) {
-    commit(types.DID_LAND_CHECKER);
-    if (rootState.games.queuedGame) {
-      const game = rootState.games.queuedGame;
-      commit(types.DEQUEUE_GAME_UPDATE, { game });
-      dispatch('updateGame', { game });
-    }
-
-    return dispatch('switchTurn');
   },
 };
 
 const mutations = {
-  [types.WILL_FALL_CHECKER]: (state, { row, col, color }) => {
-    log(types.WILL_FALL_CHECKER, { row, col, color });
-    Vue.set(state, 'droppedChecker', { row, col, color });
-  },
-
-  [types.DID_LAND_CHECKER]: (state) => {
-    log(types.DID_LAND_CHECKER);
-    Vue.delete(state, 'droppedChecker');
-  },
-
   [types.WILL_BOARD_UPDATE](state) {
     state.isLocked = true;
   },

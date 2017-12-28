@@ -91,11 +91,7 @@ const actions = {
         });
 
       const updateGame = (game) => {
-        if (getters.droppedChecker) {
-          dispatch('enqueueUpdateGame', { game });
-        } else {
-          dispatch('updateGame', { game });
-        }
+        dispatch('updateGame', { game });
       };
       channel.on('game:welcome', updateGame);
       channel.on('game:updated', updateGame);
@@ -162,14 +158,6 @@ const mutations = {
 
   [types.WILL_GAME_UPDATE](state) {
     state.isWaiting = true;
-  },
-
-  [types.ENQUEUE_GAME_UPDATE](state, { game }) {
-    state.queuedGame = game;
-  },
-
-  [types.DEQUEUE_GAME_UPDATE](state) {
-    Vue.delete(state, 'queuedGame');
   },
 
   [types.DID_GAME_UPDATE](state, { game }) {

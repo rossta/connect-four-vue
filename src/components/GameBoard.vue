@@ -40,19 +40,19 @@
         ></rect>
       </mask>
     </defs>
-    <dropped-checker :checker="droppedChecker"></dropped-checker>
     <template v-for="col in cols">
       <g @click="drop(col)" class="column">
         <template v-for="row in rows">
-          <game-checker
+          <board-checker
             v-if="checkerColor(row, col)"
             :key="key(row, col)"
-            :domId="`checker-${row}-${col}`"
+            :row="row"
+            :col="col"
             :color="checkerColor(row, col)"
             :cx="checkerX(col)"
             :cy="checkerY(row)"
             :r="checkerRadius"
-            ></game-checker>
+            ></board-checker>
         </template>
         <rect
           fill="cadetblue"
@@ -74,8 +74,7 @@ import debug from 'debug';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
 import store from '@/store';
-import GameChecker from './GameChecker';
-import DroppedChecker from './DroppedChecker';
+import BoardChecker from './BoardChecker';
 
 const log = debug('app:components/GameBoard');
 const range = num => [...Array(num).keys()];
@@ -84,8 +83,7 @@ export default {
   props: ['channel'],
 
   components: {
-    GameChecker,
-    DroppedChecker,
+    BoardChecker,
   },
 
   data() {
@@ -106,7 +104,6 @@ export default {
     ...mapGetters([
       'boardWidth',
       'boardHeight',
-      'droppedChecker',
       'checkerColor',
       'checkerRadius',
       'playerColor',

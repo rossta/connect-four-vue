@@ -1,34 +1,25 @@
 <template>
   <div>
     <h2>Game {{$route.params.id}}</h2>
-    <p>
-      <span>your color: {{playerColor}}</span> |
-      <span>player turn: {{next}}</span>  |
-
-      <span v-if="gameNotStarted">status: Waiting for more players</span>
-      <span v-if="gameInPlay">status: {{ hasTurn ? "Your turn!" : "Wait..." }}</span>
-
-      <template v-if="gameOver">
-        <span>status: game over!</span> |
-        <span>winner: {{winner}}</span>
-      </template>
-    </p>
     <a class="btn"></a>
+    <score-board />
     <game-board :channel="channel"></game-board>
   </div>
 </template>
 
 <script>
 import debug from 'debug';
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapActions } from 'vuex';
 
 import GameBoard from './GameBoard';
+import ScoreBoard from './ScoreBoard';
 
 const log = debug('app:components/Game');
 
 export default {
   components: {
     GameBoard,
+    ScoreBoard,
   },
 
   data() {
@@ -52,19 +43,6 @@ export default {
     channel() {
       return this.$phoenix.channel(`game:${this.gameId}`);
     },
-
-    ...mapState({
-      winner: state => state.games.winner,
-      next: state => state.games.next,
-    }),
-
-    ...mapGetters([
-      'hasTurn',
-      'playerColor',
-      'gameInPlay',
-      'gameNotStarted',
-      'gameOver',
-    ]),
   },
 
   methods: {

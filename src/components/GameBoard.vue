@@ -18,7 +18,7 @@
             :row="row"
             :col="col"
             :color="checkerColor(row, col)"
-            ></board-checker>
+            />
         </template>
         <rect
           :key="col"
@@ -29,7 +29,7 @@
           y="0"
           fill="cadetblue"
           mask="url(#game-wall)"
-        ></rect>
+          />
       </g>
     </template>
   </svg>
@@ -55,7 +55,7 @@ export default {
   data() {
     const { rowCount, colCount } = store.state.boards;
     return {
-      rows: range(rowCount).reverse(), // so rows count up
+      rows: range(rowCount),
       cols: range(colCount),
     };
   },

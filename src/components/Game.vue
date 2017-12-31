@@ -1,9 +1,9 @@
 <template>
   <div>
-    <h2>Game {{$route.params.id}}</h2>
     <a class="btn"></a>
     <score-board />
     <game-board :channel="channel"></game-board>
+    <div>Game {{$route.params.id}}</div>
   </div>
 </template>
 

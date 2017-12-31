@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <router-link to="/">
-      <img class="logo" src="./assets/logo.png">
+      <svg-icon :path="'logo.svg'" class="logo"></svg-icon>
     </router-link>
     <router-view/>
   </div>
@@ -10,16 +10,19 @@
 <script>
 import debug from 'debug';
 
+import SvgIcon from '@/components/SvgIcon';
+
 const log = debug('app:App');
 
 export default {
   name: 'app',
 
-  created() {
-    log('created');
+  components: {
+    SvgIcon,
   },
 
-  methods: {
+  created() {
+    log('created');
   },
 };
 </script>
@@ -35,6 +38,8 @@ export default {
 }
 
 .logo {
+  display: block;
+  margin: 0 auto;
   width: 75px;
 }
 

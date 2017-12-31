@@ -6,7 +6,7 @@
     :css="false">
     <game-checker
       :domId="`board-checker-${row}-${col}`"
-      :cy="-checkerRadius / 2"
+      :cy="centerY"
       :cx="centerX"
       :color="color"
       ></game-checker>
@@ -40,16 +40,19 @@ export default {
     },
 
     fromY() {
-      return -this.cellSize * 1.5;
+      return -1 * (this.centerY + this.cellSize);
     },
 
-    toY() {
-      return this.centerY + this.checkerRadius / 2;
+    destY() {
+      return 0;
+    },
+
+    percentage() {
+      return (this.rowCount - this.row) / this.rowCount;
     },
 
     duration() {
-      const percentage = (this.rowCount - this.row) / this.rowCount;
-      return 0.2 + 0.4 * percentage;
+      return 0.2 + 0.4 * this.percentage;
     },
 
     ...mapState({
@@ -69,16 +72,14 @@ export default {
 
     enter(el, done) {
       log('enter', el.id);
+      const fromParams = { y: this.fromY };
+      const destParams = {
+        y: this.destY,
+        ease: Ease,
+        onComplete: done,
+      };
 
-      return TweenLite.fromTo(
-        el,
-        this.duration, {
-          y: this.fromY,
-        }, {
-          y: this.toY,
-          ease: Ease,
-          onComplete: done,
-        });
+      return TweenLite.fromTo(el, this.duration, fromParams, destParams);
     },
 
     leave(el, done) {

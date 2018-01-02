@@ -34,10 +34,15 @@ const getters = {
 
   hasTurn: (state, getter) => getter.playerColor === state.next,
 
+  hasTurnRed: state => state.next === RED,
+  hasTurnBlack: state => state.next === BLACK,
+
+  playerIsRed: (state, getter) => state.red === getter.playerId,
+  playerIsBlack: (state, getter) => state.black === getter.playerId,
+
   playerColor: (state, getter) => {
-    const { red, black } = state;
-    if (getter.playerId === red) return RED;
-    if (getter.playerId === black) return BLACK;
+    if (getter.playerIsRed) return RED;
+    if (getter.playerIsBlack) return BLACK;
     return AUDIENCE;
   },
 };

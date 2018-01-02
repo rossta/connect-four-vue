@@ -10,22 +10,16 @@
 <script>
 import { mapGetters } from 'vuex';
 
-const adjust = {
-  red: '#FC7E69',
-  black: '#254689',
-};
-
 export default {
   props: ['domId', 'color', 'cx', 'cy'],
 
   computed: {
     adjustedColor() {
       const color = this.color;
-      return adjust[color] || color;
+      return this.$store.getters.colorHex(color);
     },
 
     ...mapGetters([
-      'checkerColor',
       'checkerRadius',
     ]),
   },

@@ -25,13 +25,22 @@ const checkers = {};
 const defaultState = {
   checkers,
   isLocked: true,
+  isUpdating: true,
   rowCount: 6,
   colCount: 7,
   cellSize: 100,
+  colorHexes: {
+    red: '#FC7E69',
+    black: '#254689',
+  },
 };
 
 const getters = {
   checkerColor: state => (row, col) => getChecker(state.checkers, row, col).color,
+
+  colorHex: state => color => state.colorHexes[color] || color,
+  redHex: state => state.colorHexes.red,
+  blackHex: state => state.colorHexes.black,
 
   boardWidth: state => state.colCount * state.cellSize,
   boardHeight: state => state.rowCount * state.cellSize,

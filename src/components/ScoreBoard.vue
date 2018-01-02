@@ -1,16 +1,26 @@
 <template>
-  <div
-    class="score-board"
-    v-bind:style="{ width: boardWidth + 'px' }">
+  <div class="score-board">
     <div class="player-1 cell">
-      You: {{playerColor}}
+      <p>
+        <span v-bind:style="{ color: redHex }">RED</span><br/>
+        <span v-if="playerIsRed">(You)</span>
+      </p>
     </div>
     <div class="status cell">
-      <span v-if="gameNotStarted">Waiting for more players</span>
-      <span v-if="gameInPlay">{{ hasTurn ? "Your turn!" : `Wait for ${next}` }}</span>
-      <span v-if="gameOver">Game over! {{winner}} wins</span>
+      <p>
+        <transition name="slide-fade">
+          <span v-if="gameNotStarted">Waiting for more players</span>
+          <span v-if="gameInPlay && hasTurn">Your turn!</span>
+          <span v-if="gameInPlay && !hasTurn">Waiting for {{next}}</span>
+          <span v-if="gameOver">Game over! {{winner.color}} wins</span>
+        </transition>
+      </p>
     </div>
     <div class="player-2 cell">
+      <p>
+        <span v-bind:style="{ color: blackHex }">BLACK</span><br/>
+        <span v-if="playerIsBlack">(You)</span>
+      </p>
     </div>
   </div>
 </template>
@@ -18,28 +28,51 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 
+import GameChecker from './GameChecker';
+
 export default {
+  components: {
+    GameChecker,
+  },
+
   computed: {
     ...mapState({
+      cellSize: state => state.boards.cellSize,
       winner: state => state.games.winner,
       next: state => state.games.next,
-      boardWidth: state => state.boards.boardWidth,
     }),
 
     ...mapGetters([
+      'boardWidth',
       'hasTurn',
       'playerColor',
       'gameInPlay',
       'gameNotStarted',
       'gameOver',
+      'redHex',
+      'blackHex',
+      'playerIsRed',
+      'playerIsBlack',
     ]),
   },
 };
 </script>
 
-<style>
+<style scoped>
 .score-board {
+  width: 430px;
   display: grid;
-  grid-template: repeat(1, 1fr) / repeat(3, 1fr);
+  grid-template-columns: [player1] 25% [status] 50% [player2] 25%;
+  margin: 0 auto;
+  padding: 1em 0;
+  font-weight: bold;
+}
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-enter {
+  transform: translateX(100px);
+  opacity: 0;
 }
 </style>

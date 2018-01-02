@@ -1,8 +1,8 @@
 <template>
   <div>
     <a class="btn"></a>
-    <score-board />
     <game-board :channel="channel"></game-board>
+    <score-board />
     <div>Game {{$route.params.id}}</div>
   </div>
 </template>

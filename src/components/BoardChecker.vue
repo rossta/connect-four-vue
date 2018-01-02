@@ -9,6 +9,7 @@
       :cy="centerY"
       :cx="centerX"
       :color="color"
+      :opacity="opacity"
       ></game-checker>
   </transition>
 </template>
@@ -26,11 +27,38 @@ const log = debug('app:components/BoardChecker');
 export default {
   props: ['col', 'row', 'color'],
 
+  data() {
+    return {
+      opacity: 1.0,
+    };
+  },
+
   components: {
     GameChecker,
   },
 
+  watch: {
+    winnerUpdate() {
+      if (!this.winner || this.isWinningChecker) {
+        this.opacity = 1.0;
+      } else {
+        this.opacity = 0.2;
+      }
+    },
+  },
+
   computed: {
+    isWinningChecker() {
+      if (!this.winner) return false;
+
+      return this.winner.moves
+        .some(({ row, col }) => this.row === row && this.col === col);
+    },
+
+    winnerUpdate() {
+      return !this.isUpdating && this.winner;
+    },
+
     centerX() {
       return this.$store.getters.centerX(this.col);
     },
@@ -58,6 +86,8 @@ export default {
     ...mapState({
       rowCount: state => state.boards.rowCount,
       cellSize: state => state.boards.cellSize,
+      isUpdating: state => state.boards.isUpdating,
+      winner: state => state.games.winner,
     }),
 
     ...mapGetters([
@@ -76,7 +106,10 @@ export default {
       const destParams = {
         y: this.destY,
         ease: Ease,
-        onComplete: done,
+        onComplete: () => {
+          this.$store.dispatch('landChecker');
+          done();
+        },
       };
 
       return TweenLite.fromTo(el, this.duration, fromParams, destParams);

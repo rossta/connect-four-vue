@@ -4,14 +4,15 @@
     :cx="cx"
     :cy="cy"
     :r="checkerRadius"
-    :fill="adjustedColor" />
+    :fill="adjustedColor"
+    :fill-opacity="opacity" />
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 
 export default {
-  props: ['domId', 'color', 'cx', 'cy'],
+  props: ['domId', 'color', 'cx', 'cy', 'opacity'],
 
   computed: {
     adjustedColor() {

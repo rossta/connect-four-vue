@@ -20,14 +20,10 @@
             :color="checkerColor(row, col)"
             />
         </template>
-        <rect
+        <board-column
           :key="col"
           :col="col"
-          :width="cellSize"
-          :height="boardHeight"
-          :x="cellSize * col"
-          y="0"
-          fill="cadetblue"
+          :color="'cadetblue'"
           mask="url(#game-wall)"
           />
       </g>
@@ -41,6 +37,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 
 import store from '@/store';
 import BoardChecker from './BoardChecker';
+import BoardColumn from './BoardColumn';
 
 const log = debug('app:components/GameBoard');
 const range = num => [...Array(num).keys()];
@@ -50,6 +47,7 @@ export default {
 
   components: {
     BoardChecker,
+    BoardColumn,
   },
 
   data() {
@@ -67,6 +65,7 @@ export default {
       colCount: state => state.boards.colCount,
       cellSize: state => state.boards.cellSize,
     }),
+
     ...mapGetters([
       'boardWidth',
       'boardHeight',

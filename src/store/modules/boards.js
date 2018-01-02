@@ -71,24 +71,33 @@ const actions = {
       return;
     }
 
-    commit(types.WILL_GAME_UPDATE);
-    commit(types.WILL_BOARD_UPDATE);
+    commit(types.WILL_UPDATE_GAME);
+    commit(types.WILL_UPDATE_BOARD);
 
     Promise.all([
       dispatch('sendMove', { col, color, channel }),
       dispatch('switchTurn', { color }),
     ]);
   },
+
+  landChecker({ commit }) {
+    commit(types.DID_LAND_CHECKER);
+  },
 };
 
 const mutations = {
-  [types.WILL_BOARD_UPDATE](state) {
+  [types.WILL_UPDATE_BOARD](state) {
+    state.isUpdating = true;
     state.isLocked = true;
   },
 
-  [types.DID_BOARD_UPDATE]: (state, { board }) => {
-    state.isLocked = false;
+  [types.DID_UPDATE_BOARD]: (state, { board }) => {
     setCheckers(state, board.cells);
+    state.isLocked = false;
+  },
+
+  [types.DID_LAND_CHECKER]: (state) => {
+    state.isUpdating = false;
   },
 };
 

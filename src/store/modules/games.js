@@ -82,8 +82,8 @@ const actions = {
             channel.push('game:joined');
           }
 
-          commit(types.DID_GAME_UPDATE, { game });
-          commit(types.DID_BOARD_UPDATE, { board });
+          commit(types.DID_UPDATE_GAME, { game });
+          commit(types.DID_UPDATE_BOARD, { board });
           resolve(game);
         })
         .receive('error', (error) => {
@@ -101,8 +101,8 @@ const actions = {
 
   updateGame({ commit }, { game }) {
     const { board } = game;
-    commit(types.DID_GAME_UPDATE, { game });
-    commit(types.DID_BOARD_UPDATE, { board });
+    commit(types.DID_UPDATE_GAME, { game });
+    commit(types.DID_UPDATE_BOARD, { board });
     return Promise.resolve(true);
   },
 
@@ -153,12 +153,12 @@ const mutations = {
     // state.next = switchColor(state.next);
   },
 
-  [types.WILL_GAME_UPDATE](state) {
+  [types.WILL_UPDATE_GAME](state) {
     state.isWaiting = true;
   },
 
-  [types.DID_GAME_UPDATE](state, { game }) {
-    log(types.DID_GAME_UPDATE, { game });
+  [types.DID_UPDATE_GAME](state, { game }) {
+    log(types.DID_UPDATE_GAME, { game });
     const { red, black, next, status, winner, turns } = game;
     if (winner) log('WINNER!!!', winner);
     state.isWaiting = false;

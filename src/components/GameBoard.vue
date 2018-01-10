@@ -18,12 +18,17 @@
             :row="row"
             :col="col"
             :color="checkerColor(row, col)"
+            :cellSize="cellSize"
+            :rowCount="rowCount"
+            :checkerRadius="checkerRadius"
             />
         </template>
         <board-column
           :key="col"
           :col="col"
           :color="'cadetblue'"
+          :boardHeight="boardHeight"
+          :cellSize="cellSize"
           mask="url(#game-wall)"
           />
       </g>
@@ -33,9 +38,7 @@
 
 <script>
 import debug from 'debug';
-import { mapActions, mapGetters, mapState } from 'vuex';
 
-import store from '@/store';
 import BoardChecker from './BoardChecker';
 import BoardColumn from './BoardColumn';
 
@@ -43,7 +46,7 @@ const log = debug('app:components/GameBoard');
 const range = num => [...Array(num).keys()];
 
 export default {
-  props: ['channel'],
+  props: [],
 
   components: {
     BoardChecker,
@@ -51,28 +54,34 @@ export default {
   },
 
   data() {
-    const { rowCount, colCount } = store.state.boards;
     return {
-      rows: range(rowCount),
-      cols: range(colCount),
+      rowCount: 6,
+      colCount: 7,
+      cellSize: 100,
+      checkers: {},
     };
   },
 
   computed: {
-    ...mapState({
-      isLocked: state => state.boards.isLocked,
-      rowCount: state => state.boards.rowCount,
-      colCount: state => state.boards.colCount,
-      cellSize: state => state.boards.cellSize,
-    }),
+    rows() {
+      return range(this.rowCount);
+    },
 
-    ...mapGetters([
-      'boardWidth',
-      'boardHeight',
-      'checkerColor',
-      'checkerRadius',
-      'playerColor',
-    ]),
+    cols() {
+      return range(this.colCount);
+    },
+
+    boardWidth() {
+      return this.colCount * this.cellSize;
+    },
+
+    boardHeight() {
+      return this.rowCount * this.cellSize;
+    },
+
+    checkerRadius() {
+      return this.cellSize * 0.45;
+    },
   },
 
   methods: {
@@ -80,21 +89,17 @@ export default {
       return `${row}${col}`;
     },
 
-    drop(col) {
-      log('drop in column', col);
-
-      if (this.isLocked) {
-        log('board locked');
-        return;
-      }
-
-      const color = this.playerColor;
-      this.dropChecker({ col, color, channel: this.channel });
+    getChecker(row, col) {
+      return this.checkers[`${row}${col}`] || {};
     },
 
-    ...mapActions([
-      'dropChecker',
-    ]),
+    checkerColor(row, col) {
+      return this.getChecker(row, col).color;
+    },
+
+    drop(col) {
+      log('drop in column', col);
+    },
   },
 };
 </script>

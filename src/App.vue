@@ -1,17 +1,14 @@
 <template>
   <div id="app">
-    <router-link to="/" class="logo">
-      <svg-icon :path="'logo.svg'" class="logo-svg"></svg-icon>
-      <h3>Connect Four</h3>
-    </router-link>
-    <router-view/>
+    <h3>Connect Four</h3>
+    <game-board></game-board>
   </div>
 </template>
 
 <script>
 import debug from 'debug';
 
-import SvgIcon from '@/components/SvgIcon';
+import GameBoard from '@/components/GameBoard';
 
 const log = debug('app:App');
 
@@ -19,7 +16,7 @@ export default {
   name: 'app',
 
   components: {
-    SvgIcon,
+    GameBoard,
   },
 
   created() {

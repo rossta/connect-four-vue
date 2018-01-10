@@ -4,67 +4,47 @@
     @enter="enter"
     @leave="leave"
     :css="false">
-    <game-checker
-      :domId="`board-checker-${row}-${col}`"
-      :cy="centerY"
+    <circle
+      id="`board-checker-${row}-${col}`"
       :cx="centerX"
-      :color="color"
-      :opacity="opacity"
-      ></game-checker>
+      :cy="centerY"
+      :r="checkerRadius"
+      :fill="adjustedColor"
+      />
   </transition>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
 import { TweenLite } from 'gsap';
 import debug from 'debug';
 
-import GameChecker from './GameChecker';
 import Ease from './utils/Ease';
 
 const log = debug('app:components/BoardChecker');
 
 export default {
-  props: ['col', 'row', 'color'],
+  props: ['row', 'col', 'color', 'cellSize', 'rowCount', 'checkerRadius'],
 
   data() {
     return {
-      opacity: 1.0,
+      colorHexes: {
+        red: '#FC7E69',
+        black: '#254689',
+      },
     };
   },
 
-  components: {
-    GameChecker,
-  },
-
-  watch: {
-    winnerUpdate() {
-      if (!this.winner || this.isWinningChecker) {
-        this.opacity = 1.0;
-      } else {
-        this.opacity = 0.2;
-      }
-    },
-  },
-
   computed: {
-    isWinningChecker() {
-      if (!this.winner) return false;
-
-      return this.winner.moves
-        .some(({ row, col }) => this.row === row && this.col === col);
-    },
-
-    winnerUpdate() {
-      return !this.isUpdating && this.winner;
+    adjustedColor() {
+      return this.colorHexes[this.color];
     },
 
     centerX() {
-      return this.$store.getters.centerX(this.col);
+      return (this.cellSize / 2) + (this.cellSize * this.col);
     },
 
     centerY() {
-      return this.$store.getters.centerY(this.row);
+      return (this.cellSize / 2) + (this.cellSize * (this.rowCount - 1 - this.row));
     },
 
     fromY() {
@@ -82,17 +62,6 @@ export default {
     duration() {
       return 0.2 + 0.4 * this.percentage;
     },
-
-    ...mapState({
-      rowCount: state => state.boards.rowCount,
-      cellSize: state => state.boards.cellSize,
-      isUpdating: state => state.boards.isUpdating,
-      winner: state => state.games.winner,
-    }),
-
-    ...mapGetters([
-      'checkerRadius',
-    ]),
   },
 
   methods: {
@@ -107,7 +76,6 @@ export default {
         y: this.destY,
         ease: Ease,
         onComplete: () => {
-          this.$store.dispatch('landChecker');
           done();
         },
       };

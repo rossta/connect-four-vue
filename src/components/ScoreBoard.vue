@@ -68,6 +68,10 @@ export default {
   font-weight: bold;
 }
 
+.score-board .status {
+  font-weight: normal;
+}
+
 .slide-fade-enter-active {
   transition: all .3s ease;
 }

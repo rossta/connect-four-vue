@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <a class="btn"></a>
+  <div class="game">
     <game-board :channel="channel"></game-board>
     <score-board />
     <div>Game {{$route.params.id}}</div>
@@ -67,3 +66,9 @@ export default {
   },
 };
 </script>
+
+<style scope>
+.game {
+  padding: 1em;
+}
+</style>

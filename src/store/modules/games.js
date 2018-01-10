@@ -150,7 +150,6 @@ const mutations = {
 
   [types.DID_SWITCH_TURN](state, { color }) {
     log(types.DID_SWITCH_TURN, 'next', state.next, 'from', color);
-    // state.next = switchColor(state.next);
   },
 
   [types.WILL_UPDATE_GAME](state) {

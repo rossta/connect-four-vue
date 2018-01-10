@@ -1,9 +1,11 @@
 <template>
   <div class="lobby">
     <h1>{{ msg }}</h1>
-    <h2>{{ status }}</h2>
-    <div>
-      <router-link to="/games/new">New Game</router-link>
+    <div v-if="isLoading">
+      <p>{{ status }}</p>
+    </div>
+    <div v-else>
+      <p><router-link class="btn" to="/games/new">Start new game</router-link></p>
       <router-view></router-view>
     </div>
   </div>
@@ -20,7 +22,7 @@ export default {
   data() {
     return {
       isLoading: false,
-      msg: 'Welcome to Connect Four',
+      msg: 'Welcome!',
     };
   },
 
@@ -36,7 +38,7 @@ export default {
 
   computed: {
     status() {
-      return this.isLoading ? 'Loading...' : 'Welcome!';
+      return this.isLoading ? 'Loading...' : 'Ready to play?';
     },
 
     channel() {
@@ -61,5 +63,14 @@ li {
 }
 a {
   color: #42b983;
+}
+
+a.btn {
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  padding: 1em 3em;
+  border: 1px #CCC solid;
+  background: cadetblue;
 }
 </style>

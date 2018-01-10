@@ -1,7 +1,8 @@
 <template>
   <div id="app">
-    <router-link to="/">
-      <svg-icon :path="'logo.svg'" class="logo"></svg-icon>
+    <router-link to="/" class="logo">
+      <svg-icon :path="'logo.svg'" class="logo-svg"></svg-icon>
+      <h3>Connect Four</h3>
     </router-link>
     <router-view/>
   </div>
@@ -28,6 +29,14 @@ export default {
 </script>
 
 <style>
+body {
+  background-color: azure;
+}
+
+a {
+  text-decoration: none;
+}
+
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -38,12 +47,16 @@ export default {
 }
 
 .logo {
+  display: inline-block;
+}
+.logo h3 {
+  margin: 0;
+}
+
+.logo-svg {
   display: block;
   margin: 0 auto;
   width: 75px;
 }
 
-body {
-  background-color: azure;
-}
 </style>

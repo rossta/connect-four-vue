@@ -1,104 +1,100 @@
 <template>
-  <svg :viewBox="`0 0 ${boardWidth} ${boardHeight}`" xmlns="http://www.w3.org/2000/svg" class="game-board" stroke="none">
+  <svg :viewBox="`0 0 ${boardWidth} ${boardHeight}`"
+    xmlns="http://www.w3.org/2000/svg"
+    class="game-board" stroke="none">
     <defs>
-      <pattern id="cell-spaces" x="0" y="0" patternUnits="userSpaceOnUse" :width="cellSize" :height="cellSize">
-        <circle :cx="cellSize / 2" :cy="cellSize / 2" :r="checkerRadius" fill="black" ></circle>
+      <pattern :id="patternId" patternUnits="userSpaceOnUse" :width="cellSize" :height="cellSize">
+        <circle :cx="cellSize / 2" :cy="cellSize / 2" :r="checkerRadius" fill="black"></circle>
       </pattern>
-      <mask id="game-wall" x="0" y="0">
-        <rect x="0" y="0" :width="boardWidth" :height="boardHeight" fill="white"></rect>
-        <rect x="0" y="0" :width="boardWidth" :height="boardHeight" fill="url(#cell-spaces)"></rect>
+      <mask :id="maskId">
+        <rect :width="cellSize" :height="boardHeight" fill="white"></rect>
+        <rect :width="cellSize" :height="boardHeight" :fill="pattern"></rect>
       </mask>
     </defs>
     <template v-for="col in cols">
-      <g @click="drop(col)" class="column">
-        <template v-for="row in rows">
-          <board-checker
-            v-if="checkerColor(row, col)"
-            :key="key(row, col)"
-            :row="row"
-            :col="col"
-            :color="checkerColor(row, col)"
-            :cellSize="cellSize"
-            :rowCount="rowCount"
-            :checkerRadius="checkerRadius"
-            />
-        </template>
-        <board-column
-          :key="col"
-          :col="col"
-          :color="'cadetblue'"
-          :boardHeight="boardHeight"
-          :cellSize="cellSize"
-          mask="url(#game-wall)"
-          />
+      <board-column
+        :key="col"
+        :checkers="colCheckers(col)"
+        :col="col"
+        :color="'cadetblue'"
+        :cellSize="cellSize"
+        :checkerRadius="checkerRadius"
+        :boardHeight="boardHeight"
+        :rowCount="rowCount"
+        :mask="mask"
+        @drop="dropTo"
+        />
       </g>
     </template>
   </svg>
 </template>
 
 <script>
+import Vue from 'vue';
 import debug from 'debug';
 
-import BoardChecker from './BoardChecker';
 import BoardColumn from './BoardColumn';
 
 const log = debug('app:components/GameBoard');
+
 const range = num => [...Array(num).keys()];
 
-export default {
-  props: [],
+const key = (row, col) => `${row}${col}`;
+const cssUrl = id => `url(#${id})`;
 
+const RED = 'red';
+const BLACK = 'black';
+
+export default {
   components: {
-    BoardChecker,
     BoardColumn,
   },
 
   data() {
     return {
+      patternId: 'cell-pattern',
+      maskId: 'cell-mask',
       rowCount: 6,
       colCount: 7,
       cellSize: 100,
       checkers: {},
+      color: RED,
     };
   },
 
   computed: {
-    rows() {
-      return range(this.rowCount);
-    },
+    pattern() { return cssUrl(this.patternId); },
+    mask() { return cssUrl(this.maskId); },
 
-    cols() {
-      return range(this.colCount);
-    },
+    rows() { return range(this.rowCount); },
+    cols() { return range(this.colCount); },
 
-    boardWidth() {
-      return this.colCount * this.cellSize;
-    },
-
-    boardHeight() {
-      return this.rowCount * this.cellSize;
-    },
-
-    checkerRadius() {
-      return this.cellSize * 0.45;
-    },
+    boardWidth() { return this.colCount * this.cellSize; },
+    boardHeight() { return this.rowCount * this.cellSize; },
+    checkerRadius() { return this.cellSize * 0.45; },
   },
 
   methods: {
-    key(row, col) {
-      return `${row}${col}`;
+    key,
+
+    colCheckers(col) {
+      return Object.values(this.checkers).filter(c => c.col === col);
     },
 
-    getChecker(row, col) {
-      return this.checkers[`${row}${col}`] || {};
+    toggleColor() {
+      if (this.color === RED) {
+        this.color = BLACK;
+      } else {
+        this.color = RED;
+      }
     },
 
-    checkerColor(row, col) {
-      return this.getChecker(row, col).color;
-    },
+    dropTo({ col, row }) {
+      const color = this.color;
 
-    drop(col) {
-      log('drop in column', col);
+      log('setting checker', key(row, col), { row, col, color });
+      Vue.set(this.checkers, key(row, col), { row, col, color });
+      this.toggleColor();
     },
   },
 };
@@ -108,8 +104,7 @@ export default {
 .game-board {
   border: 5px cadetblue solid;
 
-  width: 420px;
-  height: 360px;
+  width: 630px;
   margin: 0 auto;
 }
 

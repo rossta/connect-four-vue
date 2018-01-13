@@ -5,7 +5,6 @@
     @leave="leave"
     :css="false">
     <circle
-      id="`board-checker-${row}-${col}`"
       :cx="centerX"
       :cy="centerY"
       :r="checkerRadius"
@@ -23,7 +22,7 @@ import Ease from './utils/Ease';
 const log = debug('app:components/BoardChecker');
 
 export default {
-  props: ['row', 'col', 'color', 'cellSize', 'rowCount', 'checkerRadius'],
+  props: ['checker', 'cellSize', 'rowCount', 'checkerRadius'],
 
   data() {
     return {
@@ -35,12 +34,16 @@ export default {
   },
 
   computed: {
+    row() { return this.checker.row; },
+    col() { return this.checker.col; },
+    color() { return this.checker.color; },
+
     adjustedColor() {
       return this.colorHexes[this.color];
     },
 
     centerX() {
-      return (this.cellSize / 2) + (this.cellSize * this.col);
+      return (this.cellSize / 2);
     },
 
     centerY() {
@@ -66,11 +69,12 @@ export default {
 
   methods: {
     beforeEnter(e) {
-      log('beforeEnter', e.id);
+      log('beforeEnter', e);
     },
 
     enter(el, done) {
-      log('enter', el.id);
+      log('enter', el, this.row, this.col, this.color);
+
       const fromParams = { y: this.fromY };
       const destParams = {
         y: this.destY,

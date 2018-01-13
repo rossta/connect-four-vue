@@ -1,0 +1,15 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" stroke="none">
+  <defs>
+    <pattern id="cell-pattern" patternUnits="userSpaceOnUse" width="100" height="100">
+      <circle  cx="50" cy="50" r="45" fill="black"></circle>
+    </pattern>
+    <mask id="cell-mask">
+      <rect width="100" height="600" fill="white"></rect>
+      <rect width="100" height="600" fill="url(#cell-pattern)"></rect>
+    </mask>
+  </defs>
+  <g class="column">
+    <circle cx="50" cy="550" r="45" fill="#254689"></circle>
+    <rect col="0" width="100" height="600" fill="cadetblue" mask="url(#cell-mask)"></rect>
+  </g>
+</svg>

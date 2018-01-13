@@ -1,0 +1,34 @@
+<svg viewBox="0 0 700 600" xmlns="http://www.w3.org/2000/svg" stroke="none">
+  <defs>
+    <pattern id="cell-pattern" patternUnits="userSpaceOnUse" width="100" height="100">
+      <circle  cx="50" cy="50" r="45" fill="black"></circle>
+    </pattern>
+    <mask id="cell-mask">
+      <rect width="100" height="600" fill="white"></rect>
+      <rect width="100" height="600" fill="url(#cell-pattern)"></rect>
+    </mask>
+  </defs>
+  <svg x="0" y="0">
+    <circle cx="50" cy="550" r="45" fill="#254689"></circle>
+    <rect width="100" height="600" fill="cadetblue" mask="url(#cell-mask)"></rect>
+  </svg>
+  <svg x="100" y="0">
+    <rect width="100" height="600" fill="cadetblue" mask="url(#cell-mask)"></rect>
+  </svg>
+  <svg x="200" y="0">
+    <circle cx="50" cy="550" r="45" fill="#FC7E69"></circle>
+    <rect width="100" height="600" fill="cadetblue" mask="url(#cell-mask)"></rect>
+  </svg>
+  <svg x="300" y="0">
+    <rect width="100" height="600" fill="cadetblue" mask="url(#cell-mask)"></rect>
+  </svg>
+  <svg x="400" y="0">
+    <rect width="100" height="600" fill="cadetblue" mask="url(#cell-mask)"></rect>
+  </svg>
+  <svg x="500" y="0">
+    <rect width="100" height="600" fill="cadetblue" mask="url(#cell-mask)"></rect>
+  </svg>
+  <svg x="600" y="0">
+    <rect col="6" width="100" height="600" fill="cadetblue" mask="url(#cell-mask)"></rect>
+  </svg>
+</svg>

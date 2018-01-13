@@ -1,26 +1,47 @@
 <template>
-  <rect
-    :key="col"
-    :col="col"
-    :width="cellSize"
-    :height="boardHeight"
-    :x="cellSize * col"
-    :y="0"
-    :fill="color"
-    :fill-opacity="opacity"
-    />
+  <svg :x="col * cellSize" y="0">
+    <g @click="drop(col)" class="column">
+      <template v-for="checker in checkers">
+        <board-checker
+          :key="key(checker)"
+          :checker="checker"
+          />
+      </template>
+      <rect
+        :key="col"
+        :col="col"
+        :width="cellSize"
+        :height="boardHeight"
+        :fill="color"
+        :mask="mask"
+        />
+    </g>
+  </svg>
 </template>
 
 <script>
+import debug from 'debug';
 import { mapGetters, mapState } from 'vuex';
 
+import BoardChecker from './BoardChecker';
+
+const log = debug('app:components/BoardColumn');
+
 export default {
-  props: ['col', 'color'],
+  props: ['checkers', 'col', 'color', 'mask'],
+
+  components: {
+    BoardChecker,
+  },
 
   data() {
     return {
       opacity: 1.0,
     };
+  },
+
+  created() {
+    log('checkers', this.checkers);
   },
 
   watch: {
@@ -30,6 +51,24 @@ export default {
       } else {
         this.opacity = 1.0;
       }
+    },
+  },
+
+  methods: {
+    key({ row, col }) {
+      return `${row}${col}`;
+    },
+
+    drop(col) {
+      this.$emit('drop', col);
+
+      // const row = this.nextOpenRow;
+      //
+      // if (row < this.rowCount) {
+      //   this.$emit('drop', { row, col });
+      // } else {
+      //   console.log('cannot drop', { row, col });
+      // }
     },
   },
 

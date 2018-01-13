@@ -1,31 +1,23 @@
 <template>
   <svg :viewBox="`0 0 ${boardWidth} ${boardHeight}`" xmlns="http://www.w3.org/2000/svg" class="game-board" stroke="none">
     <defs>
-      <pattern id="cell-spaces" x="0" y="0" patternUnits="userSpaceOnUse" :width="cellSize" :height="cellSize">
-        <circle :cx="cellSize / 2" :cy="cellSize / 2" :r="checkerRadius" fill="black" ></circle>
+      <pattern :id="patternId" patternUnits="userSpaceOnUse" :width="cellSize" :height="cellSize">
+        <circle :cx="cellSize / 2" :cy="cellSize / 2" :r="checkerRadius" fill="black"></circle>
       </pattern>
-      <mask id="game-wall" x="0" y="0">
-        <rect x="0" y="0" :width="boardWidth" :height="boardHeight" fill="white"></rect>
-        <rect x="0" y="0" :width="boardWidth" :height="boardHeight" fill="url(#cell-spaces)"></rect>
+      <mask :id="maskId">
+        <rect :width="cellSize" :height="boardHeight" fill="white"></rect>
+        <rect :width="cellSize" :height="boardHeight" :fill="pattern"></rect>
       </mask>
     </defs>
     <template v-for="col in cols">
-      <g @click="drop(col)" class="column">
-        <template v-for="row in rows">
-          <board-checker
-            v-if="checkerColor(row, col)"
-            :key="key(row, col)"
-            :row="row"
-            :col="col"
-            :color="checkerColor(row, col)"
-            />
-        </template>
-        <board-column
-          :key="col"
-          :col="col"
-          :color="'cadetblue'"
-          mask="url(#game-wall)"
-          />
+      <board-column
+        :key="col"
+        :checkers="colCheckers(col)"
+        :col="col"
+        :color="'cadetblue'"
+        :mask="mask"
+        @drop="dropTo"
+        />
       </g>
     </template>
   </svg>
@@ -35,12 +27,14 @@
 import debug from 'debug';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
-import store from '@/store';
 import BoardChecker from './BoardChecker';
 import BoardColumn from './BoardColumn';
 
 const log = debug('app:components/GameBoard');
 const range = num => [...Array(num).keys()];
+
+const key = (row, col) => `${row}${col}`;
+const cssUrl = id => `url(#${id})`;
 
 export default {
   props: ['channel'],
@@ -51,15 +45,21 @@ export default {
   },
 
   data() {
-    const { rowCount, colCount } = store.state.boards;
     return {
-      rows: range(rowCount),
-      cols: range(colCount),
+      patternId: 'cell-pattern',
+      maskId: 'cell-mask',
     };
   },
 
   computed: {
+    pattern() { return cssUrl(this.patternId); },
+    mask() { return cssUrl(this.maskId); },
+
+    rows() { return range(this.rowCount); },
+    cols() { return range(this.colCount); },
+
     ...mapState({
+      checkers: state => state.boards.checkers,
       isLocked: state => state.boards.isLocked,
       rowCount: state => state.boards.rowCount,
       colCount: state => state.boards.colCount,
@@ -76,11 +76,13 @@ export default {
   },
 
   methods: {
-    key(row, col) {
-      return `${row}${col}`;
+    key,
+
+    colCheckers(col) {
+      return Object.values(this.checkers).filter(c => c.col === col);
     },
 
-    drop(col) {
+    dropTo(col) {
       log('drop in column', col);
 
       if (this.isLocked) {

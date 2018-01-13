@@ -9,7 +9,8 @@
       :cy="centerY"
       :r="checkerRadius"
       :fill="adjustedColor"
-      :fill-opacity="opacity" />
+      :fill-opacity="opacity"
+      />
   </transition>
 </template>
 
@@ -21,7 +22,7 @@ import debug from 'debug';
 const log = debug('app:components/BoardChecker');
 
 export default {
-  props: ['col', 'row', 'color'],
+  props: ['checker'],
 
   data() {
     return {
@@ -40,6 +41,10 @@ export default {
   },
 
   computed: {
+    row() { return this.checker.row; },
+    col() { return this.checker.col; },
+    color() { return this.checker.color; },
+
     adjustedColor() {
       const color = this.color;
       return this.$store.getters.colorHex(color);
@@ -48,8 +53,7 @@ export default {
     isWinningChecker() {
       if (!this.winner) return false;
 
-      return this.winner.moves
-        .some(({ row, col }) => this.row === row && this.col === col);
+      return this.winner.moves.some(({ row, col }) => this.row === row && this.col === col);
     },
 
     winnerUpdate() {
@@ -57,11 +61,11 @@ export default {
     },
 
     centerX() {
-      return this.$store.getters.centerX(this.col);
+      return (this.cellSize / 2);
     },
 
     centerY() {
-      return this.$store.getters.centerY(this.row);
+      return (this.cellSize / 2) + (this.cellSize * (this.rowCount - 1 - this.row));
     },
 
     fromY() {

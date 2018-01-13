@@ -28,13 +28,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 
-import GameChecker from './GameChecker';
-
 export default {
-  components: {
-    GameChecker,
-  },
-
   computed: {
     ...mapState({
       cellSize: state => state.boards.cellSize,

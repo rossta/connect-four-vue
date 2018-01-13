@@ -4,23 +4,19 @@
     @enter="enter"
     @leave="leave"
     :css="false">
-    <game-checker
-      :domId="`board-checker-${row}-${col}`"
-      :cy="centerY"
+    <circle
       :cx="centerX"
-      :color="color"
-      :opacity="opacity"
-      ></game-checker>
+      :cy="centerY"
+      :r="checkerRadius"
+      :fill="adjustedColor"
+      :fill-opacity="opacity" />
   </transition>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import { TweenLite } from 'gsap';
+import { TweenMax, Bounce } from 'gsap';
 import debug from 'debug';
-
-import GameChecker from './GameChecker';
-import Ease from './utils/Ease';
 
 const log = debug('app:components/BoardChecker');
 
@@ -31,10 +27,6 @@ export default {
     return {
       opacity: 1.0,
     };
-  },
-
-  components: {
-    GameChecker,
   },
 
   watch: {
@@ -48,6 +40,11 @@ export default {
   },
 
   computed: {
+    adjustedColor() {
+      const color = this.color;
+      return this.$store.getters.colorHex(color);
+    },
+
     isWinningChecker() {
       if (!this.winner) return false;
 
@@ -105,14 +102,14 @@ export default {
       const fromParams = { y: this.fromY };
       const destParams = {
         y: this.destY,
-        ease: Ease,
+        ease: Bounce.easeOut,
         onComplete: () => {
           this.$store.dispatch('landChecker');
           done();
         },
       };
 
-      return TweenLite.fromTo(el, this.duration, fromParams, destParams);
+      return TweenMax.fromTo(el, this.duration, fromParams, destParams);
     },
 
     leave(el, done) {

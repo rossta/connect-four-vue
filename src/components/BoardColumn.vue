@@ -5,6 +5,10 @@
         <board-checker
           :key="key(checker)"
           :checker="checker"
+          :rowCount="rowCount"
+          :cellSize="cellSize"
+          :radius="checkerRadius"
+          :status="status"
           />
       </template>
       <rect
@@ -21,36 +25,27 @@
 
 <script>
 import debug from 'debug';
-import { mapGetters, mapState } from 'vuex';
+
+import { OVER } from '@/constants';
 
 import BoardChecker from './BoardChecker';
 
 const log = debug('app:components/BoardColumn');
 
 export default {
-  props: ['checkers', 'col', 'color', 'mask'],
+  props: ['checkers', 'col', 'color', 'mask', 'boardHeight', 'checkerRadius', 'rowCount', 'cellSize', 'status'],
 
   components: {
     BoardChecker,
-  },
-
-  data() {
-    return {
-      opacity: 1.0,
-    };
   },
 
   created() {
     log('checkers', this.checkers);
   },
 
-  watch: {
-    winnerUpdate() {
-      if (this.winner) {
-        this.opacity = 0.2;
-      } else {
-        this.opacity = 1.0;
-      }
+  computed: {
+    opacity() {
+      return (this.status === OVER) ? 0.2 : 1.0;
     },
   },
 
@@ -70,22 +65,6 @@ export default {
       //   console.log('cannot drop', { row, col });
       // }
     },
-  },
-
-  computed: {
-    winnerUpdate() {
-      return !this.isUpdating && this.winner;
-    },
-
-    ...mapState({
-      cellSize: state => state.boards.cellSize,
-      isUpdating: state => state.boards.isUpdating,
-      winner: state => state.games.winner,
-    }),
-
-    ...mapGetters([
-      'boardHeight',
-    ]),
   },
 };
 </script>

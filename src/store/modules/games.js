@@ -1,17 +1,19 @@
 import debug from 'debug';
 
+import {
+  AUDIENCE,
+  RED,
+  BLACK,
+  NOT_STARTED,
+  IN_PLAY,
+  OVER,
+} from '@/constants';
+
 import axios from '../axios';
+
 import * as types from '../types';
 
 const log = debug('app:store/modules/games');
-
-const AUDIENCE = 'audience';
-const RED = 'red';
-const BLACK = 'black';
-const NOT_STARTED = 'NOT_STARTED';
-const IN_PLAY = 'IN_PLAY';
-const OVER = 'OVER';
-
 // const switchColor = color => (color === 'black' ? 'red' : 'black');
 
 const defaultState = {

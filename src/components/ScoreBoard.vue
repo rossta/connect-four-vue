@@ -28,8 +28,18 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 
+import { HEXES } from '@/constants';
+
 export default {
   computed: {
+    redHex() {
+      return HEXES.red;
+    },
+
+    blackHex() {
+      return HEXES.black;
+    },
+
     ...mapState({
       cellSize: state => state.boards.cellSize,
       winner: state => state.games.winner,
@@ -43,8 +53,6 @@ export default {
       'gameInPlay',
       'gameNotStarted',
       'gameOver',
-      'redHex',
-      'blackHex',
       'playerIsRed',
       'playerIsBlack',
     ]),

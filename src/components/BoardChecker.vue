@@ -7,7 +7,7 @@
     <circle
       :cx="centerX"
       :cy="centerY"
-      :r="checkerRadius"
+      :r="radius"
       :fill="adjustedColor"
       :fill-opacity="opacity"
       />
@@ -15,49 +15,29 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
 import { TweenMax, Bounce } from 'gsap';
 import debug from 'debug';
+
+import { HEXES, OVER } from '@/constants';
 
 const log = debug('app:components/BoardChecker');
 
 export default {
-  props: ['checker'],
-
-  data() {
-    return {
-      opacity: 1.0,
-    };
-  },
-
-  watch: {
-    winnerUpdate() {
-      if (!this.winner || this.isWinningChecker) {
-        this.opacity = 1.0;
-      } else {
-        this.opacity = 0.2;
-      }
-    },
-  },
+  props: ['checker', 'rowCount', 'cellSize', 'radius', 'status'],
 
   computed: {
     row() { return this.checker.row; },
     col() { return this.checker.col; },
     color() { return this.checker.color; },
+    isWinner() { return this.checker.isWinner; },
+
+    opacity() {
+      return (this.status === OVER && !this.isWinner) ? 0.2 : 1.0;
+    },
 
     adjustedColor() {
       const color = this.color;
-      return this.$store.getters.colorHex(color);
-    },
-
-    isWinningChecker() {
-      if (!this.winner) return false;
-
-      return this.winner.moves.some(({ row, col }) => this.row === row && this.col === col);
-    },
-
-    winnerUpdate() {
-      return !this.isUpdating && this.winner;
+      return HEXES[color] || color;
     },
 
     centerX() {
@@ -65,7 +45,8 @@ export default {
     },
 
     centerY() {
-      return (this.cellSize / 2) + (this.cellSize * (this.rowCount - 1 - this.row));
+      const { cellSize, rowCount, row } = this;
+      return (cellSize / 2) + (cellSize * (rowCount - 1 - row));
     },
 
     fromY() {
@@ -77,23 +58,13 @@ export default {
     },
 
     percentage() {
-      return (this.rowCount - this.row) / this.rowCount;
+      const { rowCount, row } = this;
+      return (rowCount - row) / rowCount;
     },
 
     duration() {
       return 0.2 + 0.4 * this.percentage;
     },
-
-    ...mapState({
-      rowCount: state => state.boards.rowCount,
-      cellSize: state => state.boards.cellSize,
-      isUpdating: state => state.boards.isUpdating,
-      winner: state => state.games.winner,
-    }),
-
-    ...mapGetters([
-      'checkerRadius',
-    ]),
   },
 
   methods: {

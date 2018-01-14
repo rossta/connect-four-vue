@@ -1,5 +1,8 @@
 <template>
-  <svg :viewBox="`0 0 ${boardWidth} ${boardHeight}`" xmlns="http://www.w3.org/2000/svg" class="game-board" stroke="none">
+  <svg
+    :viewBox="`0 0 ${boardWidth} ${boardHeight}`"
+    xmlns="http://www.w3.org/2000/svg"
+    class="game-board" stroke="none">
     <defs>
       <pattern :id="patternId" patternUnits="userSpaceOnUse" :width="cellSize" :height="cellSize">
         <circle :cx="cellSize / 2" :cy="cellSize / 2" :r="checkerRadius" fill="black"></circle>
@@ -14,8 +17,13 @@
         :key="col"
         :checkers="colCheckers(col)"
         :col="col"
-        :color="'cadetblue'"
+        :color="boardColor"
         :mask="mask"
+        :boardHeight="boardHeight"
+        :checkerRadius="checkerRadius"
+        :rowCount="rowCount"
+        :cellSize="cellSize"
+        :status="status"
         @drop="dropTo"
         />
       </g>
@@ -48,6 +56,8 @@ export default {
     return {
       patternId: 'cell-pattern',
       maskId: 'cell-mask',
+      boardColor: 'cadetblue',
+      status: 'in_play',
     };
   },
 
@@ -103,8 +113,6 @@ export default {
 
 <style scoped>
 .game-board {
-  border: 5px cadetblue solid;
-
   width: 420px;
   height: 360px;
   margin: 0 auto;

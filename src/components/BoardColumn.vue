@@ -1,16 +1,16 @@
 <template>
   <svg :x="col * cellSize" y="0">
-    <g @click="drop(col)" class="column">
-      <template v-for="checker in checkers">
-        <board-checker
-          :key="key(checker)"
-          :checker="checker"
-          :rowCount="rowCount"
-          :cellSize="cellSize"
-          :radius="checkerRadius"
-          :status="status"
-          />
-      </template>
+    <g @click="drop" class="board-column">
+      <board-checker
+        v-for="checker in checkers"
+        :key="key(checker)"
+        :checker="checker"
+        :rowCount="rowCount"
+        :cellSize="cellSize"
+        :radius="checkerRadius"
+        :status="status"
+        @land="land"
+        />
       <rect
         :key="col"
         :col="col"
@@ -47,6 +47,14 @@ export default {
     opacity() {
       return (this.status === OVER) ? 0.2 : 1.0;
     },
+
+    nextOpenRow() {
+      return Math.max(...this.checkers.map(c => c.row).concat(-1)) + 1;
+    },
+
+    canDrop() {
+      return this.nextOpenRow < this.rowCount;
+    },
   },
 
   methods: {
@@ -54,17 +62,23 @@ export default {
       return `${row}${col}`;
     },
 
-    drop(col) {
-      this.$emit('drop', col);
+    drop() {
+      if (this.canDrop) {
+        this.$emit('drop', this.col);
+      } else {
+        log('cannot drop', this.col);
+      }
+    },
 
-      // const row = this.nextOpenRow;
-      //
-      // if (row < this.rowCount) {
-      //   this.$emit('drop', { row, col });
-      // } else {
-      //   console.log('cannot drop', { row, col });
-      // }
+    land() {
+      this.$emit('land');
     },
   },
 };
 </script>
+
+<style>
+.board-column {
+  cursor: pointer;
+}
+</style>

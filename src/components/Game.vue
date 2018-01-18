@@ -1,6 +1,6 @@
 <template>
   <div class="game">
-    <game-board :channel="channel"></game-board>
+    <game-board @drop="drop" @land="land"></game-board>
     <score-board />
     <div>Game {{$route.params.id}}</div>
   </div>
@@ -60,7 +60,18 @@ export default {
         });
     },
 
+    drop(col) {
+      const { channel, playerColor: color } = this;
+      this.dropChecker({ col, color, channel });
+    },
+
+    land() {
+      this.landChecker();
+    },
+
     ...mapActions([
+      'dropChecker',
+      'landChecker',
       'joinGame',
     ]),
   },

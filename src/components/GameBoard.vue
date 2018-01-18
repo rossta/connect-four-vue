@@ -12,28 +12,27 @@
         <rect :width="cellSize" :height="boardHeight" :fill="pattern"></rect>
       </mask>
     </defs>
-    <template v-for="col in cols">
-      <board-column
-        :key="col"
-        :checkers="colCheckers(col)"
-        :col="col"
-        :color="boardColor"
-        :mask="mask"
-        :boardHeight="boardHeight"
-        :checkerRadius="checkerRadius"
-        :rowCount="rowCount"
-        :cellSize="cellSize"
-        :status="status"
-        @drop="dropTo"
-        />
-      </g>
-    </template>
+    <board-column
+      v-for="col in cols"
+      :key="col"
+      :checkers="colCheckers(col)"
+      :col="col"
+      :color="boardColor"
+      :mask="mask"
+      :boardHeight="boardHeight"
+      :checkerRadius="checkerRadius"
+      :rowCount="rowCount"
+      :cellSize="cellSize"
+      :status="status"
+      @drop="drop"
+      @land="land"
+      />
   </svg>
 </template>
 
 <script>
 import debug from 'debug';
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 import BoardChecker from './BoardChecker';
 import BoardColumn from './BoardColumn';
@@ -45,8 +44,6 @@ const key = (row, col) => `${row}${col}`;
 const cssUrl = id => `url(#${id})`;
 
 export default {
-  props: ['channel'],
-
   components: {
     BoardChecker,
     BoardColumn,
@@ -67,6 +64,10 @@ export default {
 
     rows() { return range(this.rowCount); },
     cols() { return range(this.colCount); },
+
+    canDrop() {
+      return !this.isLocked;
+    },
 
     ...mapState({
       checkers: state => state.boards.checkers,
@@ -92,21 +93,17 @@ export default {
       return Object.values(this.checkers).filter(c => c.col === col);
     },
 
-    dropTo(col) {
-      log('drop in column', col);
-
-      if (this.isLocked) {
+    drop(col) {
+      if (this.canDrop) {
+        this.$emit('drop', col);
+      } else {
         log('board locked');
-        return;
       }
-
-      const color = this.playerColor;
-      this.dropChecker({ col, color, channel: this.channel });
     },
 
-    ...mapActions([
-      'dropChecker',
-    ]),
+    land() {
+      this.$emit('land');
+    },
   },
 };
 </script>
@@ -116,9 +113,6 @@ export default {
   width: 420px;
   height: 360px;
   margin: 0 auto;
-}
-
-.column {
-  cursor: pointer;
+  border: 5px solid cadetblue;
 }
 </style>

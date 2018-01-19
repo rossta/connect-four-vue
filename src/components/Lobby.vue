@@ -13,6 +13,7 @@
 
 <script>
 import debug from 'debug';
+import phoenix from '@/phoenix';
 
 const log = debug('app:components/Lobby');
 
@@ -42,7 +43,7 @@ export default {
     },
 
     channel() {
-      return this.$phoenix.channel('lobby');
+      return phoenix.channel('lobby');
     },
   },
 };

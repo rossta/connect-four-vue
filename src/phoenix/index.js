@@ -1,8 +1,7 @@
-import Vue from 'vue';
-import Phoenix from '@/plugins/vue-phoenix';
+import Phoenix from './core';
 
-Vue.use(Phoenix);
-
-export default new Phoenix({
+const phoenix = new Phoenix({
   host: process.env.SOCKET_URL,
 });
+
+export default phoenix;

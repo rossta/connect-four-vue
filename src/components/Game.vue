@@ -8,9 +8,7 @@
 
 <script>
 import debug from 'debug';
-import { mapActions } from 'vuex';
-
-import phoenix from '@/store/phoenix';
+import { mapActions, mapGetters } from 'vuex';
 
 import GameBoard from './GameBoard';
 import ScoreBoard from './ScoreBoard';
@@ -41,9 +39,10 @@ export default {
       return this.$route.params.id;
     },
 
-    channel() {
-      return phoenix.channel(`game:${this.gameId}`);
-    },
+    ...mapGetters([
+      'gameInPlay',
+      'hasTurn',
+    ]),
   },
 
   methods: {
@@ -53,9 +52,8 @@ export default {
 
     join() {
       const gameId = this.gameId;
-      const channel = this.channel;
 
-      this.joinGame({ gameId, channel })
+      this.joinGame({ gameId })
         .catch((error) => {
           log('flash message', error);
           this.$router.push('/');
@@ -63,8 +61,19 @@ export default {
     },
 
     drop(col) {
-      const { channel, playerColor: color } = this;
-      this.dropChecker({ col, color, channel });
+      const { gameId, playerColor: color } = this;
+
+      if (!this.gameInPlay) {
+        log('game is not in play');
+        return;
+      }
+
+      if (!this.hasTurn) {
+        log('not your turn');
+        return;
+      }
+
+      this.dropChecker({ gameId, col, color });
     },
 
     land() {

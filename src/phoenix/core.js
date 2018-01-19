@@ -1,9 +1,9 @@
 import { Socket } from 'phoenix';
 import debug from 'debug';
 
-const log = debug('app:plugins/vue-phoenix');
+const log = debug('app:phoenix/phoenix');
 
-class Phoenix {
+export default class Phoenix {
   constructor({ host } = {}) {
     this.host = host;
 
@@ -29,10 +29,12 @@ class Phoenix {
   }
 
   channel(name) {
-    return this.channels.get(name) || this.socket.channel(name);
+    let ch = this.channels.get(name);
+    if (!ch) {
+      log('opening new channel', name);
+      ch = this.socket.channel(name);
+      this.channels.set(name, ch);
+    }
+    return ch;
   }
 }
-
-export default new Phoenix({
-  host: process.env.SOCKET_URL,
-});

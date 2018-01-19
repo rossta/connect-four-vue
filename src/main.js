@@ -6,9 +6,7 @@ import debug from 'debug';
 import App from './App';
 import router from './router';
 import store from './store';
-import $phoenix from './phoenix';
-
-import phoenix from './store/phoenix';
+import phoenix from './phoenix';
 
 const log = debug('app:main');
 
@@ -26,7 +24,6 @@ new Vue({
   el: '#app',
   router,
   store,
-  phoenix: $phoenix,
   template: '<App/>',
   components: { App },
 });

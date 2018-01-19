@@ -9,6 +9,8 @@ import {
   OVER,
 } from '@/constants';
 
+import phoenix from '@/phoenix';
+
 import axios from '../axios';
 
 import * as types from '../types';
@@ -60,6 +62,8 @@ const createGame = function createGame() {
     });
 };
 
+const gameChannel = gameId => phoenix.channel(`game:${gameId}`);
+
 const actions = {
   createGame({ commit }) {
     commit(types.WILL_CREATE_GAME);
@@ -71,7 +75,9 @@ const actions = {
     });
   },
 
-  joinGame({ commit, dispatch, getters }, { gameId, channel }) {
+  joinGame({ commit, dispatch, getters }, { gameId }) {
+    const channel = gameChannel(gameId);
+
     commit(types.WILL_JOIN_GAME, { gameId });
 
     return new Promise((resolve, reject) => {
@@ -108,7 +114,8 @@ const actions = {
     return Promise.resolve(true);
   },
 
-  sendMove({ commit }, { col, channel }) {
+  sendMove({ commit }, { gameId, col }) {
+    const channel = gameChannel(gameId);
     const push = channel.push('game:move', { col });
     return Promise.resolve(push);
   },

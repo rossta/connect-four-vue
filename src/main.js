@@ -6,18 +6,18 @@ import debug from 'debug';
 import App from './App';
 import router from './router';
 import store from './store';
-import phoenix from './phoenix';
+import $phoenix from './phoenix';
+
+import phoenix from './store/phoenix';
 
 const log = debug('app:main');
 
 Vue.config.productionTip = false;
 
-const connect = id => phoenix.connect('/socket', { id });
-
 router.beforeEach((to, from, next) => {
   log('router before each');
   store.dispatch('fetchPlayer')
-    .then(player => connect(player.id))
+    .then(({ id }) => phoenix.connect('/socket', { id }))
     .then(next);
 });
 
@@ -26,7 +26,7 @@ new Vue({
   el: '#app',
   router,
   store,
-  phoenix,
+  phoenix: $phoenix,
   template: '<App/>',
   components: { App },
 });

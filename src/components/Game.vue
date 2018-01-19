@@ -10,6 +10,8 @@
 import debug from 'debug';
 import { mapActions } from 'vuex';
 
+import phoenix from '@/store/phoenix';
+
 import GameBoard from './GameBoard';
 import ScoreBoard from './ScoreBoard';
 
@@ -40,7 +42,7 @@ export default {
     },
 
     channel() {
-      return this.$phoenix.channel(`game:${this.gameId}`);
+      return phoenix.channel(`game:${this.gameId}`);
     },
   },
 

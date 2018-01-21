@@ -2,6 +2,7 @@ import Vue from 'vue';
 import debug from 'debug';
 
 import axios from '../axios';
+import phoenix from '../phoenix';
 import * as types from '../types';
 
 const log = debug('app:store/modules/players');
@@ -51,7 +52,8 @@ const actions = {
         log('player info', player);
         commit(types.DID_FETCH_PLAYER, { player });
         return player;
-      });
+      })
+      .then(({ id }) => phoenix.connect('/socket', { id }));
   },
 };
 

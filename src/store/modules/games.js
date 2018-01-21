@@ -9,11 +9,9 @@ import {
   OVER,
 } from '@/constants';
 
-import phoenix from '@/phoenix';
-
-import axios from '../axios';
-
 import * as types from '../types';
+
+import network from './games/network';
 
 const log = debug('app:store/modules/games');
 // const switchColor = color => (color === 'black' ? 'red' : 'black');
@@ -51,86 +49,21 @@ const getters = {
   },
 };
 
-const createGame = function createGame() {
-  return axios.post('/games')
-    .then((response) => {
-      log('success', response);
-      return response;
-    })
-    .catch((error) => {
-      log('fail', error);
-    });
-};
-
-const gameChannel = gameId => phoenix.channel(`game:${gameId}`);
-
 const actions = {
-  createGame({ commit }) {
-    commit(types.WILL_CREATE_GAME);
-
-    return createGame().then(({ headers, data }) => {
-      const game = data;
-      commit(types.DID_CREATE_GAME, { game });
-      return { headers, data };
-    });
-  },
-
-  joinGame({ commit, dispatch, getters }, { gameId }) {
-    const channel = gameChannel(gameId);
-
-    commit(types.WILL_JOIN_GAME, { gameId });
-
-    return new Promise((resolve, reject) => {
-      channel.join()
-        .receive('ok', (game) => {
-          const { board } = game;
-
-          if (game.red === getters.playerId || game.black === getters.playerId) {
-            log('join:success', gameId, game);
-            channel.push('game:joined');
-          }
-
-          commit(types.DID_UPDATE_GAME, { game });
-          commit(types.DID_UPDATE_BOARD, { board });
-          resolve(game);
-        })
-        .receive('error', (error) => {
-          log('join:error', gameId, error.reason);
-          dispatch('leaveGame', { gameId, channel });
-          channel.leave();
-          reject(error);
-        });
-
-      const updateGame = game => dispatch('updateGame', { game });
-      channel.on('game:welcome', updateGame);
-      channel.on('game:updated', updateGame);
-    });
+  createGame({ dispatch }) {
+    return dispatch('createNetworkGame');
   },
 
   updateGame({ commit }, { game }) {
     const { board } = game;
     commit(types.DID_UPDATE_GAME, { game });
     commit(types.DID_UPDATE_BOARD, { board });
+
     return Promise.resolve(true);
   },
 
-  sendMove({ commit }, { gameId, col }) {
-    const channel = gameChannel(gameId);
-    const push = channel.push('game:move', { col });
-    return Promise.resolve(push);
-  },
-
-  leaveGame({ commit }, { gameId, channel }) {
-    return new Promise((resolve, reject) => {
-      channel.leave()
-        .receive('ok', (response) => {
-          log('leave:success', gameId, response);
-        })
-        .receive('ok', (error) => {
-          log('leave:error', gameId, error.reason);
-          reject(error);
-        });
-    });
+  addMove({ dispatch }, { gameId, col, color }) {
+    return dispatch('addNetworkMove', { gameId, col, color });
   },
 
   switchTurn({ commit }, { color }) {
@@ -184,4 +117,7 @@ export default {
   getters,
   actions,
   mutations,
+  modules: {
+    network,
+  },
 };

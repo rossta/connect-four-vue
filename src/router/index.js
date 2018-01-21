@@ -1,12 +1,18 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import debug from 'debug';
+
 import Lobby from '@/components/Lobby';
 import NewGame from '@/components/NewGame';
 import Game from '@/components/Game';
 
+import store from '@/store';
+
+const log = debug('app:router');
+
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -27,3 +33,10 @@ export default new Router({
     },
   ],
 });
+
+router.beforeEach((to, from, next) => {
+  log('router before each');
+  store.dispatch('fetchPlayer').then(next);
+});
+
+export default router;

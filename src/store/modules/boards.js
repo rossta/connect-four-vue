@@ -43,7 +43,7 @@ const actions = {
     commit(types.WILL_UPDATE_BOARD);
 
     Promise.all([
-      dispatch('sendMove', { gameId, col, color }),
+      dispatch('addMove', { gameId, col, color }),
       dispatch('switchTurn', { color }),
     ]);
   },

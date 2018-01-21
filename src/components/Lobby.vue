@@ -13,7 +13,7 @@
 
 <script>
 import debug from 'debug';
-import phoenix from '@/phoenix';
+import phoenix from '@/store/phoenix';
 
 const log = debug('app:components/Lobby');
 

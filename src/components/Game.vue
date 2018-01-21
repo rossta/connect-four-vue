@@ -53,7 +53,7 @@ export default {
     join() {
       const gameId = this.gameId;
 
-      this.joinGame({ gameId })
+      this.joinNetworkGame({ gameId })
         .catch((error) => {
           log('flash message', error);
           this.$router.push('/');
@@ -83,7 +83,7 @@ export default {
     ...mapActions([
       'dropChecker',
       'landChecker',
-      'joinGame',
+      'joinNetworkGame',
     ]),
   },
 };

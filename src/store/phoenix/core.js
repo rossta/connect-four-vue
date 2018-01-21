@@ -11,7 +11,12 @@ export default class Phoenix {
   }
 
   connect(path, params = {}) {
-    log('connecting...', ...params);
+    if (this.socket && this.socket.isConnected()) {
+      log('connect: already connected...', ...params);
+      return Promise.resolve(this.socket);
+    }
+
+    log('connect: connecting...', ...params);
     const socket = new Socket(`${this.host}${path}`, { params });
 
     return new Promise((resolve, reject) => {

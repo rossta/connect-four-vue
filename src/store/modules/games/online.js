@@ -22,17 +22,23 @@ const createGame = function createGame() {
 };
 
 const actions = {
-  createNetworkGame({ commit }) {
+  playOnline({ commit }) {
+    commit(types.WILL_PLAY_ONLINE);
+    log('playOnline');
+    return Promise.resolve(true);
+  },
+
+  createOnlineGame({ commit }) {
     commit(types.WILL_CREATE_GAME);
 
     return createGame().then(({ headers, data }) => {
       const game = data;
       commit(types.DID_CREATE_GAME, { game });
-      return { headers, data };
+      return { game, headers, data };
     });
   },
 
-  joinNetworkGame({ commit, dispatch, getters }, { gameId }) {
+  joinOnlineGame({ commit, dispatch, getters }, { gameId }) {
     const channel = gameChannel(gameId);
     const { playerId } = getters;
 
@@ -59,7 +65,7 @@ const actions = {
     });
   },
 
-  addNetworkMove({ commit }, { gameId, col }) {
+  addOnlineMove({ commit }, { gameId, col }) {
     const channel = gameChannel(gameId);
     const push = channel.push('game:move', { col });
     return Promise.resolve(push);

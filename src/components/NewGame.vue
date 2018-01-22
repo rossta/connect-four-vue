@@ -10,9 +10,9 @@ const log = debug('app:components/NewGame');
 export default {
   beforeCreate() {
     this.$store.dispatch('createGame')
-      .then(({ headers }) => {
-        log('redirecting to', headers.location);
-        this.$router.push(headers.location);
+      .then(({ game }) => {
+        log('redirecting to', `/play/games/${game.id}`);
+        this.$router.push(`/play/games/${game.id}`);
       })
       .catch(err => log(err));
   },

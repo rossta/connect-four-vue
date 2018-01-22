@@ -13,3 +13,5 @@ export const AUDIENCE = 'audience';
 export const NOT_STARTED = 'NOT_STARTED';
 export const IN_PLAY = 'IN_PLAY';
 export const OVER = 'OVER';
+export const ONLINE = 'ONLINE';
+export const OFFLINE = 'OFFLINE';

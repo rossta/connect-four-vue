@@ -20,23 +20,32 @@ const router = new Router({
       component: Lobby,
       children: [
         {
-          path: 'games/new',
+          path: 'play/games/new',
           name: 'NewGame',
           component: NewGame,
         },
       ],
     },
     {
-      path: '/games/:id',
-      name: 'Game',
+      path: '/play/games/:id',
+      name: 'OnlineGame',
       component: Game,
+      props: true,
+    },
+    {
+      path: '/play/offline',
+      name: 'OfflineGame',
+      component: Game,
+      beforeEnter(to, from, next) {
+        return store.dispatch('playOffline').then(next);
+      },
     },
   ],
 });
 
 router.beforeEach((to, from, next) => {
   log('router before each');
-  store.dispatch('fetchPlayer').then(next);
+  return store.dispatch('fetchPlayer').then(next);
 });
 
 export default router;

@@ -7,16 +7,19 @@ import {
   NOT_STARTED,
   IN_PLAY,
   OVER,
+  OFFLINE,
+  ONLINE,
 } from '@/constants';
 
 import * as types from '../types';
 
-import network from './games/network';
+import online from './games/online';
+import offline from './games/offline';
 
 const log = debug('app:store/modules/games');
-// const switchColor = color => (color === 'black' ? 'red' : 'black');
 
 const defaultState = {
+  mode: ONLINE,
   red: undefined,
   black: undefined,
   winner: undefined,
@@ -33,6 +36,9 @@ const getters = {
   gameNotStarted: state => state.status === NOT_STARTED,
   gameInPlay: state => state.status === IN_PLAY,
   gameOver: state => state.status === OVER,
+
+  isGameOnline: state => state.mode === ONLINE,
+  isGameOffline: state => state.mode === OFFLINE,
 
   hasTurn: (state, getter) => getter.playerColor === state.next,
 
@@ -51,7 +57,15 @@ const getters = {
 
 const actions = {
   createGame({ dispatch }) {
-    return dispatch('createNetworkGame');
+    return getters.isGameOnline
+      ? dispatch('createOnlineGame')
+      : dispatch('createOfflineGame');
+  },
+
+  joinGame({ dispatch, getters }, ...args) {
+    return getters.isGameOnline
+      ? dispatch('joinOnlineGame', ...args)
+      : dispatch('joinOfflineGame', ...args);
   },
 
   updateGame({ commit }, { game }) {
@@ -62,13 +76,10 @@ const actions = {
     return Promise.resolve(true);
   },
 
-  addMove({ dispatch }, { gameId, col, color }) {
-    return dispatch('addNetworkMove', { gameId, col, color });
-  },
-
-  switchTurn({ commit }, { color }) {
-    commit(types.DID_SWITCH_TURN, { color });
-    return Promise.resolve(true);
+  addMove({ dispatch, getters }, ...args) {
+    return getters.isGameOnline
+      ? dispatch('addOnlineMove', ...args)
+      : dispatch('addOfflineMove', ...args);
   },
 };
 
@@ -83,6 +94,7 @@ const mutations = {
   },
 
   [types.WILL_JOIN_GAME](state) {
+    log(types.WILL_JOIN_GAME);
     state.isJoining = true;
   },
 
@@ -90,8 +102,11 @@ const mutations = {
     state.isJoining = false;
   },
 
-  [types.DID_SWITCH_TURN](state, { color }) {
+  [types.DID_SWITCH_TURN](state, { color, playerId }) {
     log(types.DID_SWITCH_TURN, 'next', state.next, 'from', color);
+    state[state.next.toLowerCase()] = undefined;
+    state.next = color;
+    state[state.next.toLowerCase()] = playerId;
   },
 
   [types.WILL_UPDATE_GAME](state) {
@@ -110,6 +125,14 @@ const mutations = {
     state.winner = winner;
     state.turns = turns;
   },
+
+  [types.WILL_PLAY_OFFLINE](state) {
+    state.mode = OFFLINE;
+  },
+
+  [types.WILL_PLAY_ONLINE](state) {
+    state.mode = ONLINE;
+  },
 };
 
 export default {
@@ -118,6 +141,7 @@ export default {
   actions,
   mutations,
   modules: {
-    network,
+    online,
+    offline,
   },
 };

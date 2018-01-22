@@ -8,6 +8,9 @@ const checkerKey = (row, col) => `${row}${col}`;
 const getChecker = (checkers, row, col) => {
   return checkers[checkerKey(row, col)] || {};
 };
+const setChecker = (state, { row, col, color }) => {
+  Vue.set(state.checkers, checkerKey(row, col), { row, col, color });
+};
 const setCheckers = (state, checkers) => {
   Vue.set(state, 'checkers', checkers);
 };
@@ -42,10 +45,7 @@ const actions = {
     commit(types.WILL_UPDATE_GAME);
     commit(types.WILL_UPDATE_BOARD);
 
-    Promise.all([
-      dispatch('addMove', { gameId, col, color }),
-      dispatch('switchTurn', { color }),
-    ]);
+    return dispatch('addMove', { gameId, col, color });
   },
 
   landChecker({ commit }) {
@@ -58,8 +58,22 @@ const mutations = {
     state.isLocked = true;
   },
 
+  [types.WILL_RESET_BOARD](state) {
+    setCheckers(state, {});
+  },
+
   [types.DID_UPDATE_BOARD]: (state, { board }) => {
     setCheckers(state, board.cells);
+    state.isLocked = false;
+  },
+
+  [types.DID_UPDATE_BOARD]: (state, { board }) => {
+    setCheckers(state, board.cells);
+    state.isLocked = false;
+  },
+
+  [types.DID_UPDATE_CHECKER]: (state, { row, col, color }) => {
+    setChecker(state, { row, col, color });
     state.isLocked = false;
   },
 

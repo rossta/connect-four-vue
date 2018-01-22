@@ -2,7 +2,7 @@
   <div class="game">
     <game-board @drop="drop" @land="land"></game-board>
     <score-board />
-    <div>Game {{$route.params.id}}</div>
+    <div>Game {{id}}</div>
   </div>
 </template>
 
@@ -16,6 +16,8 @@ import ScoreBoard from './ScoreBoard';
 const log = debug('app:components/Game');
 
 export default {
+  props: ['id'],
+
   components: {
     GameBoard,
     ScoreBoard,
@@ -36,12 +38,14 @@ export default {
 
   computed: {
     gameId() {
-      return this.$route.params.id;
+      log('id', this.id);
+      return this.id;
     },
 
     ...mapGetters([
       'gameInPlay',
       'hasTurn',
+      'playerColor',
     ]),
   },
 
@@ -53,7 +57,7 @@ export default {
     join() {
       const gameId = this.gameId;
 
-      this.joinNetworkGame({ gameId })
+      this.joinGame({ gameId })
         .catch((error) => {
           log('flash message', error);
           this.$router.push('/');
@@ -83,7 +87,7 @@ export default {
     ...mapActions([
       'dropChecker',
       'landChecker',
-      'joinNetworkGame',
+      'joinGame',
     ]),
   },
 };

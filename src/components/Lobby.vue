@@ -5,7 +5,8 @@
       <p>{{ status }}</p>
     </div>
     <div v-else>
-      <p><router-link class="btn" to="/games/new">Start new game</router-link></p>
+      <p><router-link class="btn" to="/play/games/new">Play online</router-link></p>
+      <p><router-link class="btn" to="/play/offline">Play offline</router-link></p>
       <router-view></router-view>
     </div>
   </div>

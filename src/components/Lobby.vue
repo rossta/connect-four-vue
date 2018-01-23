@@ -14,6 +14,7 @@
 
 <script>
 import debug from 'debug';
+import { mapState, mapActions } from 'vuex';
 import phoenix from '@/store/phoenix';
 
 const log = debug('app:components/Lobby');
@@ -30,12 +31,10 @@ export default {
 
   created() {
     log('created');
-    this.isLoading = true;
-    this.channel.join()
-      .receive('ok', () => {
-        this.isLoading = false;
-      })
-      .receive('error', error => log('error', error));
+    if (!this.hasJoined) {
+      log('joining...');
+      this.join();
+    }
   },
 
   computed: {
@@ -46,33 +45,53 @@ export default {
     channel() {
       return phoenix.channel('lobby');
     },
+
+    ...mapState({
+      hasJoined: state => state.lobbies.hasJoined,
+    }),
+  },
+
+  methods: {
+    join() {
+      this.isLoading = true;
+      return this.channel.join()
+        .receive('ok', () => {
+          this.isLoading = false;
+          this.joinedLobby();
+        })
+        .receive('error', error => log('error', error));
+    },
+
+    ...mapActions([
+      'joinedLobby',
+    ]),
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+  h1, h2 {
+    font-weight: normal;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+  a {
+    color: #42b983;
+  }
 
-a.btn {
-  color: white;
-  font-weight: bold;
-  display: inline-block;
-  padding: 1em 3em;
-  border: 1px #CCC solid;
-  background: cadetblue;
-}
+  a.btn {
+    color: white;
+    font-weight: bold;
+    display: inline-block;
+    padding: 1em 3em;
+    border: 1px #CCC solid;
+    background: cadetblue;
+  }
 </style>

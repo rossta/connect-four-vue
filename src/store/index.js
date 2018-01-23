@@ -7,6 +7,7 @@ import * as getters from './getters';
 import players from './modules/players';
 import games from './modules/games';
 import boards from './modules/boards';
+import lobbies from './modules/lobbies';
 
 Vue.use(Vuex);
 
@@ -19,6 +20,7 @@ export default new Vuex.Store({
     players,
     games,
     boards,
+    lobbies,
   },
   strict: debug,
 });

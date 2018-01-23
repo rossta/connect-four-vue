@@ -18,6 +18,8 @@ import offline from './games/offline';
 
 const log = debug('app:store/modules/games');
 
+const switchColor = color => (color === BLACK ? RED : BLACK);
+
 const defaultState = {
   mode: ONLINE,
   red: undefined,
@@ -81,6 +83,12 @@ const actions = {
       ? dispatch('addOnlineMove', ...args)
       : dispatch('addOfflineMove', ...args);
   },
+
+  checkForWin({ dispatch, state, getters }) {
+    return getters.isGameOnline
+      ? Promise.resolve(state.winner)
+      : dispatch('checkForOfflineWin', state.turns[state.turns.length - 1]);
+  },
 };
 
 const mutations = {
@@ -102,10 +110,14 @@ const mutations = {
     state.isJoining = false;
   },
 
-  [types.DID_SWITCH_TURN](state, { color, playerId }) {
-    log(types.DID_SWITCH_TURN, 'next', state.next, 'from', color);
+  [types.DID_TAKE_TURN](state, { row, col, color }) {
+    state.turns.push({ row, col, color });
+  },
+
+  [types.DID_SWITCH_TURN](state, { playerId }) {
+    const color = state.next;
     state[state.next.toLowerCase()] = undefined;
-    state.next = color;
+    state.next = switchColor(color);
     state[state.next.toLowerCase()] = playerId;
   },
 
@@ -132,6 +144,11 @@ const mutations = {
 
   [types.WILL_PLAY_ONLINE](state) {
     state.mode = ONLINE;
+  },
+
+  [types.DID_WIN_GAME](state, { winner }) {
+    state.status = OVER;
+    state.winner = winner;
   },
 };
 

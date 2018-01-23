@@ -17,6 +17,7 @@
         :width="cellSize"
         :height="boardHeight"
         :fill="color"
+        :fill-opacity="opacity"
         :mask="mask"
         />
     </g>

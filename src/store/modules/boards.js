@@ -1,15 +1,20 @@
 import Vue from 'vue';
 import debug from 'debug';
+
+import {
+  EMPTY,
+} from '@/constants';
+
 import * as types from '../types';
 
 const log = debug('app:store/modules/boards');
 
 const checkerKey = (row, col) => `${row}${col}`;
 const getChecker = (checkers, row, col) => {
-  return checkers[checkerKey(row, col)] || {};
+  return checkers[checkerKey(row, col)] || { row, col, color: EMPTY };
 };
-const setChecker = (state, { row, col, color }) => {
-  Vue.set(state.checkers, checkerKey(row, col), { row, col, color });
+const setChecker = (state, { row, col, color, isWinner = false }) => {
+  Vue.set(state.checkers, checkerKey(row, col), { row, col, color, isWinner });
 };
 const setCheckers = (state, checkers) => {
   Vue.set(state, 'checkers', checkers);
@@ -26,6 +31,7 @@ const defaultState = {
 };
 
 const getters = {
+  getChecker: state => (row, col) => getChecker(state.checkers, row, col),
   checkerColor: state => (row, col) => getChecker(state.checkers, row, col).color,
 
   boardWidth: state => state.colCount * state.cellSize,
@@ -48,8 +54,13 @@ const actions = {
     return dispatch('addMove', { gameId, col, color });
   },
 
-  landChecker({ commit }) {
-    commit(types.DID_LAND_CHECKER);
+  landChecker({ commit, dispatch, getters }) {
+    return dispatch('checkForWin').then((winner) => {
+      if (!winner) {
+        commit(types.DID_LAND_CHECKER);
+        commit(types.DID_SWITCH_TURN, { playerId: getters.playerId });
+      }
+    });
   },
 };
 
@@ -67,18 +78,22 @@ const mutations = {
     state.isLocked = false;
   },
 
-  [types.DID_UPDATE_BOARD]: (state, { board }) => {
-    setCheckers(state, board.cells);
-    state.isLocked = false;
-  },
-
   [types.DID_UPDATE_CHECKER]: (state, { row, col, color }) => {
     setChecker(state, { row, col, color });
+  },
+
+  [types.DID_LAND_CHECKER]: (state) => {
+    log('mutation', types.DID_LAND_CHECKER);
     state.isLocked = false;
   },
 
-  [types.DID_LAND_CHECKER]: () => {
-    log('mutation', types.DID_LAND_CHECKER);
+  [types.DID_WIN_BOARD](state, { winner }) {
+    log(types.DID_WIN_BOARD, 'WINNER!!!', winner);
+    state.isLocked = true;
+    winner.checkers.forEach((checker) => {
+      log(types.DID_WIN_BOARD, 'setChecker', { ...checker, ...{ isWinner: true } });
+      setChecker(state, { ...checker, ...{ isWinner: true } });
+    });
   },
 };
 

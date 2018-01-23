@@ -6,12 +6,10 @@ import {
   IN_PLAY,
   OFFLINE,
   RED,
-  BLACK,
+  EMPTY,
 } from '@/constants';
 
 const log = debug('app:store/modules/games/offline');
-
-const switchColor = color => (color === BLACK ? RED : BLACK);
 
 const nextOpenRow = (checkers, col) => {
   const stack = Object.values(checkers).filter(c => c.col === col);
@@ -37,6 +35,12 @@ const defaultState = {
 };
 
 const getters = {
+  getWinner: (state, getters) => (color, ...segment) => {
+    if (segment.length !== 4) return false;
+    const checkers = segment.map(([row, col]) => getters.getChecker(row, col));
+    if (checkers.every(c => c.color === color)) return { color, checkers };
+    return false;
+  },
 };
 
 const actions = {
@@ -61,9 +65,61 @@ const actions = {
     const row = nextOpenRow(rootState.boards.checkers, col);
 
     commit(types.DID_UPDATE_CHECKER, { row, col, color });
-    commit(types.DID_SWITCH_TURN, { color: switchColor(color), playerId: getters.playerId });
+    commit(types.DID_TAKE_TURN, { row, col, color });
+
     return Promise.resolve(true);
   },
+
+  /* eslint-disable */
+  checkForOfflineWin({ getters, rootState, commit }, { row: centerRow, col: centerCol, color }) {
+    const start = num => Math.max(num - 3, 0);
+    const fin = (num, max) => Math.min(num + 3, max);
+    const { getWinner, checkerColor } = getters;
+    const { rowCount, colCount } = rootState.boards;
+
+    let winner;
+    for (let row = start(centerRow); row < fin(centerRow, rowCount); row++) {
+      if (winner) break;
+
+      for (let col = start(centerCol); col < fin(centerCol, colCount); col++) {
+        if (winner) break;
+        const segmentColor = checkerColor(row, col);
+        if (segmentColor === EMPTY) continue;
+
+        if (col + 3 < colCount) {
+          winner = getWinner(segmentColor,
+            [row, col], [row, col + 1], [row, col + 2], [row, col + 3]);
+          if (winner) break;
+        }
+
+        if (row + 3 < rowCount) {
+          winner = getWinner(segmentColor,
+            [row, col], [row + 1, col], [row + 2, col], [row + 3, col]);
+          if (winner) break;
+
+          if (col + 3 < colCount) {
+            winner = getWinner(segmentColor,
+              [row, col], [row + 1, col + 1], [row + 2, col + 2], [row + 3, col + 3]);
+            if (winner) break;
+          }
+
+          if (col - 3 >= 0) {
+            winner = getWinner(segmentColor,
+              [row, col], [row + 1, col - 1], [row + 2, col - 2], [row + 3, col - 3]);
+            if (winner) break;
+          }
+        }
+      }
+
+      if (winner) {
+        commit(types.DID_WIN_GAME, { winner });
+        commit(types.DID_WIN_BOARD, { winner });
+      }
+
+      return Promise.resolve(winner);
+    }
+  },
+  /* eslint-enable */
 };
 
 const mutations = {

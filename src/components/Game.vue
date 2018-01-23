@@ -1,14 +1,14 @@
 <template>
   <div class="game">
-    <game-board @drop="drop" @land="land"></game-board>
+    <game-board :status="status" @drop="drop" @land="land"></game-board>
     <score-board />
-    <div>Game {{id}}</div>
+    <div>Game {{gameId}}</div>
   </div>
 </template>
 
 <script>
 import debug from 'debug';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 import GameBoard from './GameBoard';
 import ScoreBoard from './ScoreBoard';
@@ -38,9 +38,12 @@ export default {
 
   computed: {
     gameId() {
-      log('id', this.id);
-      return this.id;
+      return this.id || 'offline';
     },
+
+    ...mapState({
+      status: state => state.games.status,
+    }),
 
     ...mapGetters([
       'gameInPlay',

@@ -44,6 +44,8 @@ const key = (row, col) => `${row}${col}`;
 const cssUrl = id => `url(#${id})`;
 
 export default {
+  props: ['status'],
+
   components: {
     BoardChecker,
     BoardColumn,
@@ -54,7 +56,6 @@ export default {
       patternId: 'cell-pattern',
       maskId: 'cell-mask',
       boardColor: 'cadetblue',
-      status: 'in_play',
     };
   },
 

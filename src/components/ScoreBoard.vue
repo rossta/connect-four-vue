@@ -12,7 +12,7 @@
           <span v-if="gameNotStarted">Waiting for more players</span>
           <span v-if="gameInPlay && hasTurn">Your turn!</span>
           <span v-if="gameInPlay && !hasTurn">Waiting for {{next}}</span>
-          <span v-if="gameOver">Game over! {{winner.color}} wins</span>
+          <span v-if="gameOver">Game over! {{winnerName}} wins</span>
         </transition>
       </p>
     </div>
@@ -30,6 +30,8 @@ import { mapState, mapGetters } from 'vuex';
 
 import { HEXES } from '@/constants';
 
+const titleize = text => text[0].toUpperCase() + text.slice(1);
+
 export default {
   computed: {
     redHex() {
@@ -40,8 +42,13 @@ export default {
       return HEXES.black;
     },
 
+    winnerName() {
+      return this.winner && titleize(this.winner.color);
+    },
+
     ...mapState({
       cellSize: state => state.boards.cellSize,
+      status: state => state.games.status,
       winner: state => state.games.winner,
       next: state => state.games.next,
     }),

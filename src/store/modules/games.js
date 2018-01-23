@@ -71,9 +71,14 @@ const actions = {
   },
 
   updateGame({ commit }, { game }) {
-    const { board } = game;
+    const { board, winner } = game;
     commit(types.DID_UPDATE_GAME, { game });
     commit(types.DID_UPDATE_BOARD, { board });
+
+    if (winner) {
+      commit(types.DID_WIN_GAME, { winner });
+      commit(types.DID_WIN_BOARD, { winner });
+    }
 
     return Promise.resolve(true);
   },
@@ -126,15 +131,13 @@ const mutations = {
   },
 
   [types.DID_UPDATE_GAME](state, { game }) {
+    const { red, black, next, status, turns } = game;
     log(types.DID_UPDATE_GAME, { game });
-    const { red, black, next, status, winner, turns } = game;
-    if (winner) log('WINNER!!!', winner);
     state.isWaiting = false;
     state.red = red;
     state.black = black;
     state.next = next;
     state.status = status.toUpperCase();
-    state.winner = winner;
     state.turns = turns;
   },
 
@@ -147,6 +150,7 @@ const mutations = {
   },
 
   [types.DID_WIN_GAME](state, { winner }) {
+    if (winner) log('WINNER!!!', winner);
     state.status = OVER;
     state.winner = winner;
   },

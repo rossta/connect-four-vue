@@ -10,11 +10,15 @@ import * as types from '../types';
 const log = debug('app:store/modules/boards');
 
 const checkerKey = (row, col) => `${row}${col}`;
-const getChecker = (checkers, row, col) => {
-  return checkers[checkerKey(row, col)] || { row, col, color: EMPTY };
+const getChecker = (state, row, col) => {
+  return state.checkers[checkerKey(row, col)] || { row, col, color: EMPTY };
 };
-const setChecker = (state, { row, col, color, isWinner = false }) => {
-  Vue.set(state.checkers, checkerKey(row, col), { row, col, color, isWinner });
+const setChecker = (state, { row, col, ...attrs }) => {
+  Vue.set(state.checkers, checkerKey(row, col), Object.assign({}, { row, col, ...attrs }));
+};
+const updateChecker = (state, { row, col, ...attrs }) => {
+  const checker = getChecker(state, row, col);
+  setChecker(state, Object.assign({}, checker, { row, col, ...attrs }));
 };
 const setCheckers = (state, checkers) => {
   Vue.set(state, 'checkers', checkers);
@@ -31,8 +35,8 @@ const defaultState = {
 };
 
 const getters = {
-  getChecker: state => (row, col) => getChecker(state.checkers, row, col),
-  checkerColor: state => (row, col) => getChecker(state.checkers, row, col).color,
+  getChecker: state => (row, col) => getChecker(state, row, col),
+  checkerColor: state => (row, col) => getChecker(state, row, col).color,
 
   boardWidth: state => state.colCount * state.cellSize,
   boardHeight: state => state.rowCount * state.cellSize,
@@ -90,9 +94,9 @@ const mutations = {
   [types.DID_WIN_BOARD](state, { winner }) {
     log(types.DID_WIN_BOARD, 'WINNER!!!', winner);
     state.isLocked = true;
-    winner.checkers.forEach((checker) => {
-      log(types.DID_WIN_BOARD, 'setChecker', { ...checker, ...{ isWinner: true } });
-      setChecker(state, { ...checker, ...{ isWinner: true } });
+    winner.moves.forEach((checker) => {
+      log(types.DID_WIN_BOARD, 'updateChecker', { ...checker, ...{ isWinner: true } });
+      updateChecker(state, { ...checker, ...{ isWinner: true } });
     });
   },
 };

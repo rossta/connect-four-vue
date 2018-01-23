@@ -37,8 +37,8 @@ const defaultState = {
 const getters = {
   getWinner: (state, getters) => (color, ...segment) => {
     if (segment.length !== 4) return false;
-    const checkers = segment.map(([row, col]) => getters.getChecker(row, col));
-    if (checkers.every(c => c.color === color)) return { color, checkers };
+    const moves = segment.map(([row, col]) => getters.getChecker(row, col));
+    if (moves.every(c => c.color === color)) return { color, moves };
     return false;
   },
 };

@@ -25,6 +25,7 @@ const defaultState = {
   red: undefined,
   black: undefined,
   winner: undefined,
+  enqueuedWinner: undefined,
   next: undefined,
   status: NOT_STARTED,
   turns: [],
@@ -55,13 +56,21 @@ const getters = {
     if (getter.playerIsBlack) return BLACK;
     return AUDIENCE;
   },
+
+  lastMove: state => state.turns[state.turns.length - 1],
 };
 
 const actions = {
-  createGame({ dispatch }) {
-    return getters.isGameOnline
+  createGame({ commit, dispatch }) {
+    const promise = getters.isGameOnline
       ? dispatch('createOnlineGame')
       : dispatch('createOfflineGame');
+
+    return promise.then(({ game }) => {
+      commit(types.DID_CREATE_GAME, { game: { ...game, ...defaultState } });
+
+      return { game };
+    });
   },
 
   joinGame({ dispatch, getters }, ...args) {
@@ -76,11 +85,10 @@ const actions = {
     commit(types.DID_UPDATE_BOARD, { board });
 
     if (winner) {
-      commit(types.DID_WIN_GAME, { winner });
-      commit(types.DID_WIN_BOARD, { winner });
+      commit(types.ENQUEUE_WIN, { winner });
     }
 
-    return Promise.resolve(true);
+    return Promise.resolve({ game });
   },
 
   addMove({ dispatch, getters }, ...args) {
@@ -89,10 +97,19 @@ const actions = {
       : dispatch('addOfflineMove', ...args);
   },
 
-  checkForWin({ dispatch, state, getters }) {
-    return getters.isGameOnline
-      ? Promise.resolve(state.winner)
-      : dispatch('checkForOfflineWin', state.turns[state.turns.length - 1]);
+  checkForWin({ dispatch, commit, getters }) {
+    const promise = getters.isGameOnline
+      ? dispatch('checkForOnlineWin')
+      : dispatch('checkForOfflineWin');
+
+    return promise.then((winner) => {
+      if (winner) {
+        commit(types.DID_WIN_GAME, { winner });
+        commit(types.DID_WIN_BOARD, { winner });
+      }
+
+      return winner;
+    });
   },
 };
 
@@ -101,9 +118,17 @@ const mutations = {
     state.isCreating = true;
   },
 
-  [types.DID_CREATE_GAME](state, { player }) {
-    state.player = player;
+  [types.DID_CREATE_GAME](state, { game }) {
     state.isCreating = false;
+
+    const { red, black, next, status, turns } = game;
+    log(types.DID_CREATE_GAME, { game });
+    state.isWaiting = false;
+    state.red = red;
+    state.black = black;
+    state.next = next;
+    state.status = status.toUpperCase();
+    state.turns = turns;
   },
 
   [types.WILL_JOIN_GAME](state) {
@@ -153,6 +178,11 @@ const mutations = {
     if (winner) log('WINNER!!!', winner);
     state.status = OVER;
     state.winner = winner;
+    state.enqueuedWinner = undefined;
+  },
+
+  [types.ENQUEUE_WIN](state, { winner }) {
+    state.enqueuedWinner = winner;
   },
 };
 

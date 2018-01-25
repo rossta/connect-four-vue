@@ -31,3 +31,5 @@ export const WILL_PLAY_ONLINE = 'WILL_PLAY_ONLINE';
 export const WILL_PLAY_OFFLINE = 'WILL_PLAY_OFFLINE';
 
 export const DID_JOIN_LOBBY = 'DID_JOIN_LOBBY';
+
+export const ENQUEUE_WIN = 'ENQUEUE_WIN';

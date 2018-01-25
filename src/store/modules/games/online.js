@@ -30,11 +30,10 @@ const actions = {
 
   createOnlineGame({ commit }) {
     commit(types.WILL_CREATE_GAME);
+    commit(types.WILL_RESET_BOARD);
 
-    return createGame().then(({ headers, data }) => {
-      const game = data;
-      commit(types.DID_CREATE_GAME, { game });
-      return { game, headers, data };
+    return createGame().then(({ data }) => {
+      return { game: data };
     });
   },
 
@@ -69,6 +68,10 @@ const actions = {
     const channel = gameChannel(gameId);
     const push = channel.push('game:move', { col });
     return Promise.resolve(push);
+  },
+
+  checkForOnlineWin({ rootState }) {
+    return Promise.resolve(rootState.games.enqueuedWinner);
   },
 
   leaveNetworkGame({ commit }, { gameId, channel }) {

@@ -52,7 +52,8 @@ const actions = {
   createOfflineGame({ commit }) {
     commit(types.WILL_CREATE_GAME);
     commit(types.WILL_RESET_BOARD);
-    commit(types.DID_CREATE_GAME, {});
+
+    return Promise.resolve({});
   },
 
   joinOfflineGame({ dispatch, state, getters }) {
@@ -71,11 +72,14 @@ const actions = {
   },
 
   /* eslint-disable */
-  checkForOfflineWin({ getters, rootState, commit }, { row: centerRow, col: centerCol, color }) {
+  checkForOfflineWin({ getters, rootState, commit }) {
+    const { lastMove, getWinner, checkerColor } = getters;
     const start = num => Math.max(num - 3, 0);
     const fin = (num, max) => Math.min(num + 3, max);
-    const { getWinner, checkerColor } = getters;
     const { rowCount, colCount } = rootState.boards;
+
+    if (!lastMove) return;
+    const { row:centerRow, col:centerCol, color } = lastMove;
 
     let winner;
     for (let row = start(centerRow); row < fin(centerRow, rowCount); row++) {
@@ -110,14 +114,9 @@ const actions = {
           }
         }
       }
-
-      if (winner) {
-        commit(types.DID_WIN_GAME, { winner });
-        commit(types.DID_WIN_BOARD, { winner });
-      }
-
-      return Promise.resolve(winner);
     }
+
+    return Promise.resolve(winner);
   },
   /* eslint-enable */
 };

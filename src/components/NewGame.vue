@@ -8,7 +8,8 @@ import debug from 'debug';
 const log = debug('app:components/NewGame');
 
 export default {
-  beforeCreate() {
+  created() {
+    log('created');
     this.$store.dispatch('createGame')
       .then(({ game }) => {
         log('redirecting to', `/play/games/${game.id}`);

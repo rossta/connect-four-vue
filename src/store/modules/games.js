@@ -162,8 +162,10 @@ const mutations = {
     state.red = red;
     state.black = black;
     state.next = next;
-    state.status = status.toUpperCase();
     state.turns = turns;
+
+    const normalizedStatus = status.toUpperCase();
+    if (normalizedStatus !== OVER) state.status = normalizedStatus;
   },
 
   [types.WILL_PLAY_OFFLINE](state) {
@@ -175,7 +177,7 @@ const mutations = {
   },
 
   [types.DID_WIN_GAME](state, { winner }) {
-    if (winner) log('WINNER!!!', winner);
+    log('WINNER!!!', winner);
     state.status = OVER;
     state.winner = winner;
     state.enqueuedWinner = undefined;

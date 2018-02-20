@@ -2,7 +2,13 @@
   <div class="game">
     <game-board :status="status" @drop="drop" @land="land"></game-board>
     <score-board @reset="reset" />
-    <div>Share this page with a friend to play online!</div>
+    <div v-if="isGameOnline && gameNotStarted">
+      Share this page with a friend to play online!
+    </div>
+    <div v-if="isGameOffline">
+      You're currently playing offline.
+      <router-link to="/play/games/new">Go online</router-link> to play against friends!
+    </div>
   </div>
 </template>
 
@@ -49,6 +55,8 @@ export default {
       'gameInPlay',
       'hasTurn',
       'playerColor',
+      'isGameOnline',
+      'isGameOffline',
     ]),
   },
 

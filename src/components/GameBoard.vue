@@ -111,8 +111,8 @@ export default {
 
 <style scoped>
 .game-board {
-  width: 420px;
-  height: 360px;
+  width: 80%;
+  max-width: 420px;
   margin: 0 auto;
   border: 5px solid cadetblue;
 }

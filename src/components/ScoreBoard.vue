@@ -69,7 +69,8 @@ export default {
 
 <style scoped>
 .score-board {
-  width: 430px;
+  width: 80%;
+  max-width: 420px;
   display: grid;
   grid-template-columns: [player1] 25% [status] 50% [player2] 25%;
   margin: 0 auto;

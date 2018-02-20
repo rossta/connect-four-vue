@@ -1,3 +1,4 @@
+/* eslint-disable max-len, no-plusplus, consistent-return */
 import debug from 'debug';
 import * as types from '@/store/types';
 

@@ -2,7 +2,7 @@
   <div id="app">
     <router-link to="/" class="logo">
       <svg-icon :path="'logo.svg'" class="logo-svg"></svg-icon>
-      <h3>Connect Four</h3>
+      <h3><span>Connect</span> Four</h3>
     </router-link>
     <router-view/>
   </div>
@@ -51,6 +51,16 @@ a {
 }
 .logo h3 {
   margin: 0;
+  color: #254689;
+}
+.logo h3 {
+  color: #254689;
+}
+.logo h3 span {
+  color: #FC7E69;
+}
+.logo svg path {
+  fill: #254689;
 }
 
 .logo-svg {

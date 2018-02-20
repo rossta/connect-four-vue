@@ -61,13 +61,13 @@ const getters = {
 };
 
 const actions = {
-  createGame({ commit, dispatch }) {
+  createGame({ commit, dispatch, getters }) {
     const promise = getters.isGameOnline
       ? dispatch('createOnlineGame')
       : dispatch('createOfflineGame');
 
     return promise.then(({ game }) => {
-      commit(types.DID_CREATE_GAME, { game: { ...game, ...defaultState } });
+      commit(types.DID_CREATE_GAME, { game: { ...defaultState, ...game } });
 
       return { game };
     });
@@ -112,11 +112,20 @@ const actions = {
       return winner;
     });
   },
+
+  resetGame({ dispatch, getters }, ...args) {
+    const promise = getters.isGameOnline
+      ? dispatch('resetOnlineGame', ...args)
+      : dispatch('resetOfflineGame', ...args);
+
+    return promise;
+  },
 };
 
 const mutations = {
   [types.WILL_CREATE_GAME](state) {
     state.isCreating = true;
+    state.status = NOT_STARTED;
   },
 
   [types.DID_CREATE_GAME](state, { game }) {

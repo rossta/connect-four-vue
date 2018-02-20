@@ -1,8 +1,8 @@
 <template>
   <div class="game">
     <game-board :status="status" @drop="drop" @land="land"></game-board>
-    <score-board />
-    <div>Game {{gameId}}</div>
+    <score-board @reset="reset" />
+    <div>Share this page with a friend to play online!</div>
   </div>
 </template>
 
@@ -87,10 +87,16 @@ export default {
       this.landChecker();
     },
 
+    reset() {
+      const { gameId } = this;
+      this.resetGame({ gameId });
+    },
+
     ...mapActions([
       'dropChecker',
       'landChecker',
       'joinGame',
+      'resetGame',
     ]),
   },
 };

@@ -100,9 +100,10 @@ const actions = {
   },
 
   joinOfflineGame({ dispatch, state, getters }) {
-    const updates = { status: IN_PLAY, red: getters.playerId };
-    log('updateGame', { game: { ...state, ...updates } });
-    dispatch('updateGame', { game: { ...state, ...updates } });
+    const updates = { status: IN_PLAY, red: getters.playerId, board: { cells: {} } };
+    const game = { ...state, ...updates };
+    log('updateGame', { game });
+    dispatch('updateGame', { game });
   },
 
   addOfflineMove({ commit, rootState, getters }, { col, color }) {
@@ -131,7 +132,10 @@ const actions = {
 
     return Promise.resolve(winner);
   },
-  /* eslint-enable */
+
+  resetOfflineGame({ dispatch }) {
+    return dispatch('createGame').then(() => dispatch('joinGame'));
+  },
 };
 
 const mutations = {

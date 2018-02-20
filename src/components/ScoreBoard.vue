@@ -12,7 +12,7 @@
           <span v-if="gameNotStarted">Waiting for more players</span>
           <span v-if="gameInPlay && hasTurn">Your turn!</span>
           <span v-if="gameInPlay && !hasTurn">Waiting for {{next}}</span>
-          <span v-if="gameOver">Game over! {{winnerName}} wins</span>
+          <span v-if="gameOver">Game over! {{winnerName}} wins! <a href="#" @click="reset">Play again</a></span>
         </transition>
       </p>
     </div>
@@ -33,6 +33,11 @@ import { HEXES } from '@/constants';
 const titleize = text => text[0].toUpperCase() + text.slice(1);
 
 export default {
+  methods: {
+    reset() {
+      this.$emit('reset');
+    },
+  },
   computed: {
     redHex() {
       return HEXES.red;

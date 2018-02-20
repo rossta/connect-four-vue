@@ -75,10 +75,13 @@ const mutations = {
 
   [types.WILL_RESET_BOARD](state) {
     setCheckers(state, {});
+    state.isLocked = false;
   },
 
   [types.DID_UPDATE_BOARD]: (state, { board }) => {
-    setCheckers(state, board.cells);
+    // TODO: consolidate cells/checkers naming for online/offline
+    const checkers = board.cells || board.checkers;
+    setCheckers(state, checkers);
     state.isLocked = false;
   },
 
@@ -87,7 +90,7 @@ const mutations = {
   },
 
   [types.DID_LAND_CHECKER]: (state) => {
-    log('mutation', types.DID_LAND_CHECKER);
+    log(types.DID_LAND_CHECKER);
     state.isLocked = false;
   },
 

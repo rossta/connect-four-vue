@@ -87,6 +87,11 @@ const actions = {
     });
   },
 
+  resetOnlineGame({ gameId }) {
+    const channel = gameChannel(gameId);
+    const push = channel.push('game:reset');
+    return Promise.resolve(push);
+  },
 };
 
 const mutations = {
@@ -98,4 +103,3 @@ export default {
   actions,
   mutations,
 };
-

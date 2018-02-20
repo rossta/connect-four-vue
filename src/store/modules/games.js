@@ -104,6 +104,7 @@ const actions = {
 
     return promise.then((winner) => {
       if (winner) {
+        log('winner', winner);
         commit(types.DID_WIN_GAME, { winner });
         commit(types.DID_WIN_BOARD, { winner });
       }

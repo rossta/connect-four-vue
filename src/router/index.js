@@ -13,6 +13,7 @@ const log = debug('app:router');
 Vue.use(Router);
 
 const router = new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',

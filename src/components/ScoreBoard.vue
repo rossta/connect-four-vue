@@ -12,9 +12,10 @@
           <span v-if="gameNotStarted">Waiting for more players</span>
           <span v-if="gameInPlay && hasTurn">Your turn!</span>
           <span v-if="gameInPlay && !hasTurn">Waiting for {{next}}</span>
-          <span v-if="gameOver">Game over! {{winnerName}} wins! <a href="#" @click="reset">Play again</a></span>
+          <span v-if="gameOver">Game over! {{winnerName}} wins!</span>
         </transition>
       </p>
+      <a v-if="gameOver" href="#" @click="reset" class="btn">Play again</a>
     </div>
     <div class="player-2 cell">
       <p>
@@ -77,7 +78,7 @@ export default {
   width: 80%;
   max-width: 420px;
   display: grid;
-  grid-template-columns: [player1] 25% [status] 50% [player2] 25%;
+  grid-template-columns: [player1] 20% [status] 60% [player2] 20%;
   margin: 0 auto;
   padding: 1em 0;
   font-weight: bold;

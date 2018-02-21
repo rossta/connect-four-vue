@@ -82,16 +82,4 @@ export default {
     display: inline-block;
     margin: 0 10px;
   }
-  a {
-    color: #42b983;
-  }
-
-  a.btn {
-    color: white;
-    font-weight: bold;
-    display: inline-block;
-    padding: 1em 3em;
-    border: 1px #CCC solid;
-    background: cadetblue;
-  }
 </style>

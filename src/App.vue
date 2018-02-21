@@ -2,7 +2,7 @@
   <div id="app">
     <router-link to="/" class="logo">
       <svg-icon :path="'logo.svg'" class="logo-svg"></svg-icon>
-      <h3><span>Connect</span> Four</h3>
+      <h3>Connect Four</h3>
     </router-link>
     <router-view/>
   </div>
@@ -35,6 +35,16 @@ body {
 
 a {
   text-decoration: none;
+  color: #42b983;
+}
+
+a.btn {
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  padding: 1em 3em;
+  border: 1px #ccc solid;
+  background: cadetblue;
 }
 
 #app {
@@ -56,9 +66,6 @@ a {
 .logo h3 {
   color: #254689;
 }
-.logo h3 span {
-  color: #FC7E69;
-}
 .logo svg path {
   fill: #254689;
 }
@@ -66,7 +73,6 @@ a {
 .logo-svg {
   display: block;
   margin: 0 auto;
-  width: 75px;
+  width: 45px;
 }
-
 </style>

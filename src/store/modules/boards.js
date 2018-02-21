@@ -98,7 +98,6 @@ const mutations = {
     log(types.DID_WIN_BOARD, 'WINNER!!!', winner);
     state.isLocked = true;
     winner.moves.forEach((checker) => {
-      log(types.DID_WIN_BOARD, 'updateChecker', { ...checker, ...{ isWinner: true } });
       updateChecker(state, { ...checker, ...{ isWinner: true } });
     });
   },

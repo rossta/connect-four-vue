@@ -5,6 +5,9 @@
       <h3>Connect Four</h3>
     </router-link>
     <router-view/>
+    <footer>
+      A <a href="https://rossta.net/projects" target="_blank">rossta.net</a> project
+    </footer>
   </div>
 </template>
 
